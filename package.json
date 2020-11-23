@@ -1,0 +1,82 @@
+{
+  "name": "vscode-intl-javascript",
+  "publisher": "rongpingli",
+  "displayName": "vscode-intl-javascript",
+  "description": "vscode intl plugin",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.50.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-intl-javascript.CHECK_DIR_LOCALE",
+        "title": "Check-文件夹国际化"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "resourceLangId == javascript",
+          "command": "vscode-intl-javascript.helloWorld",
+          "alt": "vscode-intl-javascript.helloWorld",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "国际化配置文件路径",
+      "properties": {
+        "vscode-intl-javascript.localConfigFileName": {
+          "type": "string",
+          "default": "intl.config.js",
+          "description": "具体配置的配置文件名, 插件会查找当前文件上层文件夹中的这个文件, 一直向上插件, 直到找到为止"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint src --ext ts",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.3",
+    "@types/mocha": "^8.0.0",
+    "@types/node": "^12.11.7",
+    "@types/vscode": "^1.50.0",
+    "@typescript-eslint/eslint-plugin": "^4.1.1",
+    "@typescript-eslint/parser": "^4.1.1",
+    "eslint": "^7.9.0",
+    "glob": "^7.1.6",
+    "mocha": "^8.1.3",
+    "typescript": "^4.0.2",
+    "vscode-test": "^1.4.0"
+  },
+  "dependencies": {
+    "@babel/core": "7.9.0",
+    "@babel/generator": "7.9.4",
+    "@babel/plugin-proposal-class-properties": "7.8.3",
+    "@babel/plugin-proposal-decorators": "7.8.3",
+    "@babel/preset-react": "7.8.3",
+    "@babel/preset-typescript": "7.8.3",
+    "@babel/types": "^7.10.4",
+    "art-template": "^4.13.2",
+    "node-readfiles": "^0.2.0",
+    "node-uuid": "^1.4.8",
+    "tapable": "^2.1.1"
+  }
+}
