@@ -95,6 +95,7 @@ window.webviewListener['${name}'] = new Function(...${JSON.stringify(functionCon
     onMessage(data: any) {
         const { listenerName, id, type, params } = data;
         if (type === 'intl-js-vscode.triggerParentListener') {
+            console.log(this.parser?.webviewParentListenerHook.get(listenerName), '=--=-=-=-==-');
             this.parser?.webviewParentListenerHook.get(listenerName)?.promise(params).then(async () => {
                 this.sendMessage({
                     id,

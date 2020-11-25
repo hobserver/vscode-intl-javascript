@@ -13,7 +13,7 @@ export default function initBodyJs(parser: Parser) {
             <div id="app">
                 <el-form ref="form" :model="form" label-width="80px">
                 <el-form-item label="key">
-                    <el-input placeholder="请输入内容" v-model="form.intlKey" clearable>
+                    <el-input placeholder="请输入内容" v-model="form.key" clearable>
                     </el-input>
                 </el-form-item>
                 <el-form-item v-for="item in form.langs" :key="item.langKey" :label="item.langKey">

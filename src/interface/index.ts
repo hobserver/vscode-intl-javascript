@@ -2,6 +2,12 @@ import Parser from "../model/Parser";
 import * as vscode from 'vscode';
 export type LangKey = 'zh_CN' | 'zh_TW';
 
+export interface StorageAddParams {
+    key: string,
+    text: string,
+    lang: LangKey
+}
+
 export interface WebviewListenerParams {
     name: string,
     functionConstructorParams: string[]
@@ -9,10 +15,10 @@ export interface WebviewListenerParams {
 export interface MessageInfoSendParams {
     filePath: string,
     id: string,
-    key: string | undefined,
+    key: string,
     langs: {
         langKey: LangKey,
-        value: string | null | undefined | number
+        value: string | null | undefined
     }[]
 }
 export interface MessageInfoResParams extends MessageInfoSendParams {
@@ -54,8 +60,8 @@ export interface SimplePositionParam {
     start: number
     end: number
 }
-export type CheckResult = {
-    [key in LangKey]: CheckResultItem
+export interface CheckResult {
+    [key: string]: CheckResultItem
 }
 export interface CheckResultItem {
     exist: boolean,

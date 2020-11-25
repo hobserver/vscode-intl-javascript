@@ -1,4 +1,4 @@
-import { CheckResult, Lang, LangKey } from "../interface";
+import { CheckResult, Lang, LangKey, StorageAddParams } from "../interface";
 import Config from "./Config";
 const fs = require("fs");
 const path = require("path");
@@ -33,6 +33,10 @@ export default class IntlStorage{
     } {
         const langFile = this.getLangFile(lang);
         const result = require(langFile);
+        console.log(result, result[key], key, text, result[key] === text, {
+            exist: !!result[key],
+            ananimous: result[key] === text
+        });
         return {
             exist: !!result[key],
             ananimous: result[key] === text
@@ -46,6 +50,43 @@ export default class IntlStorage{
             }
         });
         return result;
+    }
+    storeKeyAndValues(addParams: StorageAddParams[]) {
+        // 以lang为索引，合并key
+        // @ts-ignore
+        const langs: {
+            [langKey in LangKey]: {
+                [key: string]: string
+            } 
+        } = {};
+        addParams.forEach((addItem: StorageAddParams) => {
+            if (!langs[addItem.lang]) {
+                langs[addItem.lang] = {};
+            }
+            langs[addItem.lang][addItem.key] = addItem.text;
+        });
+        // @ts-ignore
+        Object.keys(langs).forEach((langKey: LangKey) => {
+            this.writeLangKeysToFile(langKey, langs[langKey]);
+        });;
+    }
+    writeLangKeysToFile(langLey: LangKey, keys: {
+        [key: string]: string
+    }, isWhoile: boolean = false) {
+        var writeInfo = keys;
+        const langFile = this.getLangFile(langLey);
+        if (!isWhoile) {
+            const result = require(langFile);
+            writeInfo = {
+                ...result,
+                ...keys
+            }
+        }
+        const keyString = JSON.stringify(writeInfo, null, 4);
+        fs.writeFileSync(langFile, this.config.fileExt === 'js' ? `module.exports=${keyString}` : keyString);
+    }
+    storeKeyAndValue(addParam: StorageAddParams) {
+        this.storeKeyAndValues([addParam]);
     }
     public getKeyInLang(key: string, lang: LangKey): string {
         const langFile = this.getLangFile(lang);

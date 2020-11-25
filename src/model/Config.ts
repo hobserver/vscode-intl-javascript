@@ -12,12 +12,13 @@ export default class {
     public fileReg = /\.(tsx|ts|js|vue)$/
     public isCurrentFileLogError: boolean = false
     public localeDir: string | null = null;
-    
+
     // 上面的属性是需要传进来的配置
     public parser: Parser
     public filepath: string;
+    // @ts-ignore
     public langMap: {
-        [key in LangKey]?: Lang
+        [key in LangKey]: Lang
     } = {};
     public publisher = config.publisher;
     public name = config.name;

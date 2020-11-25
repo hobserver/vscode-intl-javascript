@@ -4,7 +4,7 @@ import { ErrorNodeParam, LangKey, CheckResult, Lang} from '../../../interface';
 import * as vscode from 'vscode';
 export default class HasKeyErrorNode extends BaseNode {
     extraParams
-    checkResult?: CheckResult
+    checkResult: CheckResult = {}
     firstErrorLang?: Lang
     logs: string[] = [];
     isCheck: boolean = false;
@@ -31,13 +31,16 @@ export default class HasKeyErrorNode extends BaseNode {
         Object.keys(checkResult).forEach((langKey: string) => {
             const langItem = langMap[langKey as LangKey];
             if (langItem && langItem.name) {
-                if (!checkResult[langKey as LangKey].exist) {
+                const checkItemResult = checkResult[langKey as LangKey];
+                if (!checkItemResult.exist) {
                     if (!this.firstErrorLang) {
                         this.firstErrorLang = langItem;
                     }
                     this.logs.push(langItem.name  + ' 缺少');
                 } else {
-                    this.logs.push(langItem?.name + ' 不一致');
+                    if (!checkItemResult.ananimous) {
+                        this.logs.push(langItem?.name + ' 不一致');
+                    }
                 }
             }
         });
@@ -56,20 +59,36 @@ export default class HasKeyErrorNode extends BaseNode {
         const activeEditor = this.parser.utils.getActiveEditor();
         const {document} = activeEditor;
         if (document) {
-            this.parser.addDecoration('red', {
-                range: new vscode.Range(
-                    document.positionAt(this.start),
-                    document.positionAt(this.end),
-                ),
-                renderOptions: {
-                    after: {
-                        color: 'rgba(153, 153, 153, .7)',
-                        contentText: this.logs.join(', '),
-                        fontWeight: 'normal',
-                        fontStyle: 'normal'
+            // 缺少那个，显示那个颜色，只有两个都满足才不会着色
+            
+            if (this.checkResult) {
+                var isOK: boolean = true;
+                var firstErrorColor: string = 'red';
+                Object.keys(this.checkResult).forEach((langKey: string) => {
+                    if (!(this.checkResult[langKey].exist && this.checkResult[langKey].exist)) {
+                        isOK = false;
+                        firstErrorColor = this.parser.config.langMap[langKey as LangKey].color;
                     }
+                });
+                if (!isOK) {
+                    this.parser.addDecoration(firstErrorColor, {
+                        range: new vscode.Range(
+                            document.positionAt(this.start),
+                            document.positionAt(this.end),
+                        ),
+                        renderOptions: {
+                            after: {
+                                color: 'rgba(153, 153, 153, .7)',
+                                contentText: this.logs.join(', '),
+                                fontWeight: 'normal',
+                                fontStyle: 'normal'
+                            }
+                        }
+                    });
                 }
-            });
+                
+            }
+            
         }
     }
 }

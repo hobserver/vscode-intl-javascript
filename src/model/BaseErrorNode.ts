@@ -2,6 +2,8 @@ import {ErrorNodeParam, MessageInfoSendParams, GlobalCommandMenuItem, HoverParam
 import * as vscode from 'vscode';
 import Parser from './Parser';
 var uuid = require('node-uuid');
+var md5 = require('md5');
+ 
 import * as fs from 'fs';
 import { Commands } from '../constants/command';
 export default class {
@@ -24,7 +26,6 @@ export default class {
         endRow,
         endCol
     }: ErrorNodeParam) {
-        this.id = uuid();
         this.parser = parser;
         this.filepath = filepath;
         this.start = start;
@@ -33,6 +34,7 @@ export default class {
         this.startCol = startCol;
         this.endRow = endRow;
         this.endCol = endCol;
+        this.id = md5(this.filepath + this.start + this.end);
     }
     sendErrorNodoInfoToWebwiew(params: MessageInfoSendParams) {
         this.parser.webview.triggerWebviewListener('onErrorNode', params);

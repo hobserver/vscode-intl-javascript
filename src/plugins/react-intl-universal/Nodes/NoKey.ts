@@ -1,6 +1,6 @@
 
 import BaseNode from '../../../model/BaseErrorNode';
-import {ErrorNodeParam, HoverParams} from '../../../interface';
+import {ErrorNodeParam, HoverParams, Lang, MessageInfoResParams, StorageAddParams} from '../../../interface';
 import * as vscode from 'vscode';
 export default class NoKeyErrorNode extends BaseNode {
     type = 'nokey';
@@ -21,17 +21,13 @@ export default class NoKeyErrorNode extends BaseNode {
                 await this.sendErrorNodoInfoToWebwiew({
                     filePath: this.filepath,
                     id: this.id,
-                    langs: [
-                        {
-                            langKey: 'zh_CN',
-                            value: 'sdfsdfsdf'
-                        },
-                        {
-                            langKey: 'zh_TW',
-                            value: 'sdfsdfsdf'
+                    langs: this.parser.config.langs.map((langItem: Lang, key) => {
+                        return {
+                            langKey: langItem.key,
+                            value: key === 0 ? this.extraParams.text : ''
                         }
-                    ],
-                    key: 'sdfasdfasd'
+                    }),
+                    key: ''
                 });
             }
             
@@ -46,8 +42,22 @@ export default class NoKeyErrorNode extends BaseNode {
             return false;
         }
     }
-    replace(text: string) {
-        this._replace(this.start, this.end, text);
+    replace(errorInfo: MessageInfoResParams) {
+        var addParams: StorageAddParams[] = [];
+        errorInfo.langs.forEach(item => {
+            if (item.value) {
+                addParams.push({
+                    key: errorInfo.key,
+                    text: item.value,
+                    lang: item.langKey
+                });
+            }
+        });
+        this.parser.intlStorage.storeKeyAndValues(addParams);
+        this._replace(this.start, this.end, `intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')`);
+    }
+    replaceWithBrackets(errorInfo: MessageInfoResParams) {
+        this._replace(this.start, this.end, `{intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')}`);
     }
     showMenu({
         position,
