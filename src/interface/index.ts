@@ -26,7 +26,7 @@ export interface MessageInfoResParams extends MessageInfoSendParams {
 }
 export interface GlobalCommandParam {
     filePath: string
-    type: string
+    command: string
     errorNodeId: any
 }
 export interface GlobalCommandMenuItem {

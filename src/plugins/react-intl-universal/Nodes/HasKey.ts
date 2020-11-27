@@ -1,6 +1,6 @@
 
 import BaseNode from '../../../model/BaseErrorNode';
-import { ErrorNodeParam, LangKey, CheckResult, Lang} from '../../../interface';
+import { ErrorNodeParam, LangKey, CheckResult, Lang, HoverParams} from '../../../interface';
 import * as vscode from 'vscode';
 export default class HasKeyErrorNode extends BaseNode {
     extraParams
@@ -50,6 +50,27 @@ export default class HasKeyErrorNode extends BaseNode {
             this.check();
         }
         this.appendLog(this.logs.join(',') + ' ' + this.getErrorLine());
+    }
+    showMenu({
+        position,
+        document,
+        offset
+    }: HoverParams): vscode.ProviderResult<vscode.Hover> {
+        console.log(offset, this.start, this.end);
+        if (offset > this.start && offset < this.end) {
+            console.log('3123123123');
+            return this.createHoverCommandMenu([
+                {
+                    name: '硬编码1212',
+                    params: {
+                        filePath: this.filepath,
+                        command: 'haskey',
+                        errorNodeId: this.id
+                    }
+                }
+            ]);
+        }
+        return;
     }
     putColor() {
         if (!this.isCheck) {

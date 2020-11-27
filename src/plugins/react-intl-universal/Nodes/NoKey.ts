@@ -70,7 +70,7 @@ export default class NoKeyErrorNode extends BaseNode {
                     name: '硬编码',
                     params: {
                         filePath: this.filepath,
-                        type: 'nokey',
+                        command: 'nokey',
                         errorNodeId: this.id
                     }
                 }

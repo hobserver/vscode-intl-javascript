@@ -5,7 +5,7 @@ import Parser from "./Parser";
 import {Lang, LangKey} from '../interface';
 import WebView from '../plugins/webview';
 import config from '../config';
-
+import noCacheRequire from '../utils/no-cache-require';
 export default class {
     public langs: Lang[] = [];
     public fileExt = 'json';
@@ -62,7 +62,7 @@ export default class {
         return configFile;
     }
     async handleConfigFile(configFile: string) {
-        const initConfig = require(configFile);
+        const initConfig = noCacheRequire(configFile);
         const config = initConfig(this);
         this.langs = config.langs.map((item: Lang) => {
             return Object.assign({

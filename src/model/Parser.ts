@@ -8,6 +8,7 @@ import { ParseFileParam } from '../interface';
 import WebViewPlugin from '../plugins/webview/index';
 import webview from './WebView';
 import parserManager from './ParserManager';
+import noCacheRequire from '../utils/no-cache-require';
 const {
     SyncWaterfallHook,
     SyncHook,
@@ -76,7 +77,7 @@ export default class {
                 if (!path.isAbsolute(PluginClassPath)) {
                     throw(new Error('请提供插件的绝对路径'));
                 } else {
-                    const PluginClass = require(PluginClassPath);
+                    const PluginClass = noCacheRequire(PluginClassPath);
                     const pluginInstance = new PluginClass(option);
                     await pluginInstance.apply(this);
                 }
@@ -178,7 +179,7 @@ export default class {
         Object.keys(this.decorations).forEach((decorationType: string) => {
             const decoration = vscode.window.createTextEditorDecorationType(
                 {
-                    color: 'red'
+                    color: decorationType
                 }
             );
             this._prevDecorations.push(decoration);
