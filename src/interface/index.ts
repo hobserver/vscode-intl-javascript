@@ -1,6 +1,12 @@
 import Parser from "../model/Parser";
 import * as vscode from 'vscode';
+import MenuCommand from "../plugins/menu-command/MenuCommand";
+
 export type LangKey = 'zh_CN' | 'zh_TW';
+
+export interface ParserService {
+    menuCommand: MenuCommand
+}
 
 export interface StorageAddParams {
     key: string,
@@ -27,8 +33,10 @@ export interface MessageInfoResParams extends MessageInfoSendParams {
 export interface GlobalCommandParam {
     filePath: string
     command: string
-    errorNodeId: any
+    errorNodeId: any,
+    [other: string]: any
 }
+
 export interface GlobalCommandMenuItem {
     name: string,
     params: GlobalCommandParam

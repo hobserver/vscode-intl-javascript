@@ -4,6 +4,7 @@ import utils from '../utils/index';
 import * as vscode from 'vscode';
 import BaseErrorNode from "./BaseErrorNode";
 import Parser from "./Parser";
+import { WebviewListenerParams } from "../interface";
 class SidebarWebview {
     callbackCaches: {
         [callbackName: string]: (...args: any[]) => any
@@ -44,7 +45,7 @@ class SidebarWebview {
                         } else {
                             resolve();
                         }
-                    }, 100);
+                    }, 60);
                 }
                 _run();
             });
@@ -55,6 +56,7 @@ class SidebarWebview {
             });
             this.panel?.onDidDispose((webview: any) => {
                 this.panel = undefined;
+                this.webviewReady = false;
             });
         } else {
             return Promise.reject();
@@ -74,18 +76,17 @@ class SidebarWebview {
         this.triggerWebviewListener('onErrorNode', errorNode);
     }
     addWebviewListener(name: string, functionConstructorParams: any[]) {
-        this.parser?.webViewHooks.bodyHeaderJsHook.tapPromise(name, async (scripts: string[]) => {
-            return scripts.concat([
-                `
-<script type="text/javascript">
-window.webviewListener['${name}'] = new Function(...${JSON.stringify(functionConstructorParams)})
-</script>
-                `
+        this.parser?.webViewHooks.listenerHook.tapPromise(name, async (listeners: WebviewListenerParams[]) => {
+            return listeners.concat([
+                {
+                    name,
+                    functionConstructorParams
+                }
             ]);
         });
     }
     addParentListener(name: string, func: (...args: any[]) => any) {
-        this.parser?.webviewParentListenerHook.for(name).tapPromise(name, async (...args: any) => {
+        this.parser?.processListenerHook.for(name).tapPromise(name, async (...args: any) => {
             func(...args);
         });
     }
@@ -95,8 +96,7 @@ window.webviewListener['${name}'] = new Function(...${JSON.stringify(functionCon
     onMessage(data: any) {
         const { listenerName, id, type, params } = data;
         if (type === 'intl-js-vscode.triggerParentListener') {
-            console.log(this.parser?.webviewParentListenerHook.get(listenerName), '=--=-=-=-==-');
-            this.parser?.webviewParentListenerHook.get(listenerName)?.promise(params).then(async () => {
+            this.parser?.processListenerHook.get(listenerName)?.promise(params).then(async () => {
                 this.sendMessage({
                     id,
                     type: 'intl-js-vscode.webview_callback',

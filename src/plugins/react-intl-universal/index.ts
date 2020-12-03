@@ -1,5 +1,5 @@
 
-import { MessageInfoResParams } from '../../interface';
+import { GlobalCommandParam, MessageInfoResParams } from '../../interface';
 import BaseErrorNode from '../../model/BaseErrorNode';
 import Config from '../../model/Config';
 import IntlStorage from '../../model/IntlStorage';
@@ -8,7 +8,8 @@ import HasKeyErrorNode from './Nodes/HasKey';
 var generate = require('@babel/generator');
 const path = require('path');
 const t = require("@babel/types");
-import NoKeyErrorNode from './Nodes/NoKey';
+import HardCodeErrorNode from './Nodes/HardCode';
+import command from './command';
 export = class {
     options: {
         defaultLangReg: RegExp
@@ -20,10 +21,12 @@ export = class {
     intlStorage?: IntlStorage
     constructor(options: any) {
         this.options = options;
+        
     }
     apply(parser: Parser) {
         this.config = parser.config;
         this.parser = parser;
+        const commandSerivce = this.parser?.getService('menuCommand');
         const {babelHooks, intlStorage, webViewHooks} = parser;
         this.intlStorage = intlStorage;
         babelHooks.babelPluginHook.tap('plugin', ((plugins: any[]) => {
@@ -48,7 +51,7 @@ export = class {
             const errorNode: any = this.parser?.parserManager.caches[errorInfo.filePath]?.errors.find((item: BaseErrorNode) => {
                 return item.id === errorInfo.id;
             });
-            console.log(errorNode?.replace(errorInfo));
+            errorNode?.replaceAndSave(errorInfo);
         });
         webViewHooks.btnHook.tapPromise('replace', async (btns: any[]) => {
             return btns.concat([
@@ -112,6 +115,7 @@ export = class {
                 ) {
                     const keyNode = intlNode.node.callee.object.arguments[0];
                     const textNode = intlNode.node.arguments[0];
+                    // 这里因为会重复创建很多个ErrorNode, 不太好解决
                     this.parser?.pushError(new HasKeyErrorNode({
                         parser: this.parser,
                         filepath: filePath,
@@ -169,7 +173,7 @@ export = class {
                         || locNode.end
                     ) {
                         const isHtml = /<(?:html|head|title|base|link|meta|style|script|noscript|template|body|section|nav|article|aside|h1|h2|h3|h4|h5|h6|header|footer|address|main|p|hr|pre|blockquote|ol|ul|li|dl|dt|dd|figure|figcaption|div|a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img|iframe|embed|object|param|video|audio|source|track|canvas|map|area|svg|math|table|caption|colgroup|col|tbody|thead|tfoot|tr|td|th|form|fieldset|legend|label|input|button|select|datalist|optgroup|option|textarea|keygen|output|progress|meter|details|summary|menuitem|menu)[^>]*>/;
-                        this.parser?.pushError(new NoKeyErrorNode({
+                        this.parser?.pushError(new HardCodeErrorNode({
                             parser: this.parser,
                             filepath: filePath,
                             start: node.start,

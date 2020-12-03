@@ -4,8 +4,10 @@ import BaseErrorNode from './BaseErrorNode';
 import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import utils from '../utils/index';
+import Service from './Service';
 import { ParseFileParam } from '../interface';
 import WebViewPlugin from '../plugins/webview/index';
+import CommandPlugin from '../plugins/menu-command/index';
 import webview from './WebView';
 import parserManager from './ParserManager';
 import noCacheRequire from '../utils/no-cache-require';
@@ -16,13 +18,11 @@ const {
     AsyncParallelHook,
     AsyncSeriesWaterfallHook
  } = require("tapable");
-export default class {
+export default class Parser extends Service {
     public parserManager = parserManager;
     private _prevDecorations: vscode.TextEditorDecorationType[]  = [];
     public utils = utils;
-    public plugins: any = [ // 可以传入对象，也可以传入数组
-        new WebViewPlugin()
-    ]
+    public plugins: any = [] // 可以传入对象，也可以传入数组
     public webview = webview;
     public decorations: {
         [color: string]: (vscode.Range | vscode.DecorationOptions)[]
@@ -38,9 +38,7 @@ export default class {
         babelPluginHook: typeof SyncWaterfallHook
     }
      // @ts-ignore
-    public commandHooks: typeof HookMap
-    public webviewListenerHook: typeof SyncWaterfallHook
-    public webviewParentListenerHook: typeof HookMap
+    public processListenerHook: typeof HookMap
      // @ts-ignore
     public webViewHooks: {
         htmlHook: typeof AsyncSeriesWaterfallHook,
@@ -53,6 +51,8 @@ export default class {
         btnHook: typeof AsyncSeriesWaterfallHook,
         bodyFooterJsHook: typeof AsyncSeriesWaterfallHook,
         bodyHeaderJsHook: typeof AsyncSeriesWaterfallHook,
+        listenerHook: typeof AsyncSeriesWaterfallHook,
+        sendLangInfoHook: typeof AsyncSeriesWaterfallHook,
         vueHooks: {
             createdHook: typeof AsyncSeriesWaterfallHook,
             methodsHook: typeof AsyncSeriesWaterfallHook,
@@ -62,6 +62,7 @@ export default class {
     public filepath: string
     private isComplete: boolean = true;
     constructor (filepath: string) {
+        super();
         this.filepath = filepath;
         this.config = new Config(this, filepath);
         this.intlStorage = new IntlStorage(this.config);
@@ -100,15 +101,14 @@ export default class {
             bodyHtmlHook: new AsyncSeriesWaterfallHook(['body']),
             bodyFooterJsHook: new AsyncSeriesWaterfallHook(['footerJss']),
             bodyHeaderJsHook: new AsyncSeriesWaterfallHook(['headerJss']),
+            listenerHook: new AsyncSeriesWaterfallHook(['listeners']),
+            sendLangInfoHook: new AsyncSeriesWaterfallHook(['params', 'nodeInfo', 'parser']),
             vueHooks: {
                 createdHook: new AsyncSeriesWaterfallHook(['createdInits']),
                 methodsHook: new AsyncSeriesWaterfallHook(['methods']),
             }
         };
-        this.webviewListenerHook = new SyncWaterfallHook(['listeners']);
-        this.webviewParentListenerHook = new HookMap((type: string) => new AsyncParallelHook(["params"]));;
-        this.commandHooks = new HookMap((type: string) => new SyncHook(["params"]));
-        
+        this.processListenerHook = new HookMap((type: string) => new AsyncParallelHook(["params"]));;
     }
     public addDecoration(color: string, range: vscode.Range | vscode.DecorationOptions) {
         if (!this.decorations[color]) {
@@ -117,6 +117,12 @@ export default class {
         this.decorations[color].push(range);
     }
     public pushError(errorNode: BaseErrorNode) {
+         // 重复的ErrorNode 不添加
+        if(this.errors.find((item) => {
+            return item.id === errorNode.id
+        })) {
+            return;
+        }
         const key = `${errorNode.start}-${errorNode.end}`;
         if (!this.errorsMap[key]) {
             this.errorsMap[key] = errorNode;
@@ -130,6 +136,7 @@ export default class {
     }: ParseFileParam) {
         if (!this.isComplete) return Promise.reject();
         if (!isShowLog && !isPutColor) return Promise.reject();
+       
         this.isComplete = false;
         try {
             this.resetDataForConfig(); // 重置缓存对象
@@ -145,7 +152,7 @@ export default class {
             }
             this.isComplete = true;
         } catch (err) {
-            vscode.window.showWarningMessage(`解析失败 - ${this.filepath}` + err.stack);
+            vscode.window.showWarningMessage(`解析失败 - ${this.filepath}`);
             this.isComplete = true;
             return Promise.reject();
         }
@@ -153,6 +160,7 @@ export default class {
     private resetDataForConfig() {
         this.errors = [];
         this.plugins = [
+            new CommandPlugin(),
             new WebViewPlugin()
         ];
         this.decorations = {};

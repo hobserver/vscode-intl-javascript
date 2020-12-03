@@ -12,13 +12,15 @@ export default class WebViewPlugin {
     }
     initWebviewApi(parser: Parser) {
         parser.webview.addParentListener('errorNodeReplace', (params) => {
-            console.log(params, '-0-0-00--0'); 
         });
-        
     }
     async apply(parser: Parser) {
         this.initWebviewApi(parser);
-        const {webViewHooks} = parser;
+        const {webViewHooks, webview} = parser;
+        webview.addWebviewListener('onErrorNode', [
+            'errorInfo',
+            'this.form = errorInfo;'
+        ]);
         webViewHooks.titleHook.tapPromise('title', async (title: string) => {
             return '我可以配置的哦'
         });

@@ -1,7 +1,8 @@
 
 import BaseNode from '../../../model/BaseErrorNode';
-import { ErrorNodeParam, LangKey, CheckResult, Lang, HoverParams} from '../../../interface';
+import { ErrorNodeParam, LangKey, CheckResult, GlobalCommandMenuItem, Lang, HoverParams, GlobalCommandParam, MessageInfoResParams} from '../../../interface';
 import * as vscode from 'vscode';
+import command from '../command';
 export default class HasKeyErrorNode extends BaseNode {
     extraParams
     checkResult: CheckResult = {}
@@ -19,9 +20,43 @@ export default class HasKeyErrorNode extends BaseNode {
     }) {
         super(position);
         this.extraParams = extraParams;
+        this.registerCommand(command.open_webview, async ({errorNodeId}: GlobalCommandParam) => {
+            if (this.id === errorNodeId) {
+                await this.parser.webview.open();
+                await this.sendErrorNodoInfoToWebwiew({
+                    filePath: this.filepath,
+                    id: this.id,
+                    langs: this.parser.config.langs.map((langItem: Lang, key) => {
+                        return {
+                            langKey: langItem.key,
+                            value: key === 0 ? this.extraParams.text : this.parser.intlStorage.getKeyInLang(this.extraParams.key, langItem.key)
+                        }
+                    }),
+                    key: this.extraParams.key
+                });
+            }
+        });
+        this.registerCommand(command.replace_value_to_key, async ({errorNodeId, key}: GlobalCommandParam) => {
+            if (this.id === errorNodeId) {
+                this._replace(this.extraParams.textStart, this.extraParams.textEnd,
+                    "'" + this.parser.intlStorage.getKeyInLang(key, this.parser.config.getFirstLangKey()) + "'");
+            }
+        });
+        this.registerCommand(command.replace_key_to_value_key, async ({errorNodeId, key}: GlobalCommandParam) => {
+            if (this.id === errorNodeId) {
+                this._replace(this.extraParams.keyStart, this.extraParams.keyEnd,
+                    "'" + this.parser.intlStorage.getValueKeyInLang(this.extraParams.text, this.parser.config.getFirstLangKey()) + "'");
+            }
+        });
     }
     getLog() {
 
+    }
+    replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
+        super.replaceAndSave(errorInfo, text ? text : `intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')`);
+    }
+    replaceAndSaveWithBrackets(errorInfo: MessageInfoResParams) {
+        this.replaceAndSave(errorInfo, `{intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')}`);
     }
     check() {
         const {intlStorage} = this.parser;
@@ -56,19 +91,48 @@ export default class HasKeyErrorNode extends BaseNode {
         document,
         offset
     }: HoverParams): vscode.ProviderResult<vscode.Hover> {
-        console.log(offset, this.start, this.end);
         if (offset > this.start && offset < this.end) {
-            console.log('3123123123');
-            return this.createHoverCommandMenu([
+            // 查看key是否存在
+            const keyResult = this.parser.intlStorage.checkKey(this.extraParams.key, this.extraParams.text);
+            var menus: GlobalCommandMenuItem[] = [
                 {
-                    name: '硬编码1212',
+                    name: '打开编辑界面',
                     params: {
                         filePath: this.filepath,
-                        command: 'haskey',
+                        command: command.open_webview,
                         errorNodeId: this.id
                     }
                 }
-            ]);
+            ]
+            const firstCheckResult = keyResult[this.parser.config.getFirstLangKey()];
+            if (firstCheckResult.exist && !firstCheckResult.ananimous) {
+                menus = menus.concat([
+                    {
+                        name: 'key存在，但是内容不一致，点击替换成key的值',
+                        params: {
+                            filePath: this.filepath,
+                            command: command.replace_value_to_key,
+                            errorNodeId: this.id,
+                            key: this.extraParams.key
+                        }
+                    }
+                ]);
+            }
+            const firstLangValueKey = this.parser.intlStorage.getValueKeyInLang(this.extraParams.text, this.parser.config.getFirstLangKey());
+            if (!firstCheckResult.exist && firstLangValueKey) {
+                menus = menus.concat([
+                    {
+                        name: 'key不存在，value存在对应key，点击替换成新的key',
+                        params: {
+                            filePath: this.filepath,
+                            command: command.replace_key_to_value_key,
+                            errorNodeId: this.id,
+                            key: this.extraParams.key
+                        }
+                    }
+                ]);
+            }
+            return this.createHoverCommandMenu(menus);
         }
         return;
     }
@@ -85,12 +149,15 @@ export default class HasKeyErrorNode extends BaseNode {
             if (this.checkResult) {
                 var isOK: boolean = true;
                 var firstErrorColor: string = 'red';
-                Object.keys(this.checkResult).forEach((langKey: string) => {
+                const checkResult = Object.keys(this.checkResult);
+                for (var i = 0; i < checkResult.length; i++) {
+                    const langKey = checkResult[i];
                     if (!(this.checkResult[langKey].exist && this.checkResult[langKey].exist)) {
                         isOK = false;
                         firstErrorColor = this.parser.config.langMap[langKey as LangKey].color;
+                        break;
                     }
-                });
+                }
                 if (!isOK) {
                     this.parser.addDecoration(firstErrorColor, {
                         range: new vscode.Range(

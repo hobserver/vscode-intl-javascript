@@ -2,18 +2,7 @@ import { WebviewListenerParams } from "../../interface";
 import Parser from "../../model/Parser";
 import initBodyCreateJs from "./createdHook";
 export default function initBodyJs(parser: Parser) {
-    const {webViewHooks, webview, webviewListenerHook} = parser;
-    webviewListenerHook.tap('onErrorNode', (listeners: WebviewListenerParams[]) => {
-        return listeners.concat([
-            {
-                name: 'onErrorNode',
-                functionConstructorParams: [
-                    'errorInfo',
-                    'this.form = errorInfo;'
-                ]
-            }
-        ]);
-    });
+    const {webViewHooks, webview} = parser;
     initBodyCreateJs(parser);
     webViewHooks.vueHooks.methodsHook.tapPromise('methods', async (methods: WebviewListenerParams[]) => {
         return methods.concat([

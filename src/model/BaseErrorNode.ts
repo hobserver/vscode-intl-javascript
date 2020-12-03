@@ -1,4 +1,4 @@
-import {ErrorNodeParam, MessageInfoSendParams, GlobalCommandMenuItem, HoverParams, LangKey} from '../interface';
+import {ErrorNodeParam, MessageInfoSendParams, GlobalCommandMenuItem, HoverParams, LangKey, MessageInfoResParams, StorageAddParams, GlobalCommandParam} from '../interface';
 import * as vscode from 'vscode';
 import Parser from './Parser';
 var uuid = require('node-uuid');
@@ -36,11 +36,21 @@ export default class {
         this.endCol = endCol;
         this.id = md5(this.filepath + this.start + this.end);
     }
+    registerCommand(commandId: string, callback: ({errorNodeId}: GlobalCommandParam) => void) {
+        const commandSerivce = this.parser.getService('menuCommand');
+        commandSerivce.registerCommand(commandId + this.id, callback, true);
+    }
+    removeCommand(commandId: string, callback: ({errorNodeId}: GlobalCommandParam) => void) {
+        const commandSerivce = this.parser.getService('menuCommand');
+        commandSerivce.removeCommand(commandId, true);
+    }
     sendErrorNodoInfoToWebwiew(params: MessageInfoSendParams) {
-        this.parser.webview.triggerWebviewListener('onErrorNode', params);
+        // 这里执行，对key，以及lang等参数的筛选
+        this.parser.webViewHooks.sendLangInfoHook.promise(params, this).then((data: MessageInfoSendParams) => {
+            this.parser.webview.triggerWebviewListener('onErrorNode', data);
+        });
     }
     formatErrorLog() {
-
     }
     _replace(start: number, end: number, text: string) {
         const fileContent = fs.readFileSync(this.filepath).toString();
@@ -51,6 +61,7 @@ export default class {
     }
     createHoverCommandMenu(menus: GlobalCommandMenuItem[]) {
         const commands = menus.map((item: GlobalCommandMenuItem) => {
+            item.params.command = item.params.command + item.params.errorNodeId;
             return `- [${item.name}](${this.getCommandUrl(Commands.GlobalCallback, item.params)})`;
         });
         const markdown = new vscode.MarkdownString(commands.join('\n'));
@@ -59,6 +70,20 @@ export default class {
     }
     appendLog(log: string) {
         this.parser.utils.outputChannel.appendLine(log);
+    }
+    replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
+        var addParams: StorageAddParams[] = [];
+        errorInfo.langs.forEach(item => {
+            if (item.value) {
+                addParams.push({
+                    key: errorInfo.key,
+                    text: item.value,
+                    lang: item.langKey
+                });
+            }
+        });
+        this.parser.intlStorage.storeKeyAndValues(addParams);
+        this._replace(this.start, this.end, text ? text : `intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')`);
     }
     putColor() {
         const activeEditor = this.parser.utils.getActiveEditor();
@@ -77,9 +102,6 @@ export default class {
     }
     getErrorLine() {
         return `${this.filepath}:${this.startRow}:${this.startCol}`;
-    }
-    isShowHover(params: HoverParams): boolean {
-        return false;
     }
     showMenu(params: HoverParams): vscode.ProviderResult<vscode.Hover> {
         return;

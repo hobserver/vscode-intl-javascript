@@ -39,6 +39,9 @@ export default class {
             }
         });
     }
+    getFirstLangKey() {
+        return this.langs[0].key;
+    }
     findConfigFile() {
         const vsConfigFile = vscode.workspace.getConfiguration(this.name);
         var localConfigFileName = vsConfigFile.get('localConfigFileName');

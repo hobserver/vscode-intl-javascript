@@ -7,13 +7,10 @@ export default (ctx: vscode.ExtensionContext) => {
         const {filePath, command, errorNodeId} = commandParams;
         const parser = parserManager.caches[filePath];
         if (parser) {
-            const hook = parser.commandHooks.get(command);
-            if (hook) {
-                hook.call(errorNodeId);
-                // callbacks.forEach((callback: any) => {
-                //     callback(params);
-                // });
-            }
+            const listeners = parser.getService('menuCommand').listeners[command];
+            listeners.forEach(listener => {
+                listener(commandParams);
+            });
         }
     }));
 }

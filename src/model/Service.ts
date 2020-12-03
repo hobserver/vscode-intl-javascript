@@ -1,9 +1,13 @@
-import ErrorNode from './BaseErrorNode';
-import Parser from './Parser';
+import { GlobalCommandParam, ParserService } from '../interface';
 export default class Service {
-    hook = {};
-    parser: Parser
-    constructor (parser: Parser) {
-        this.parser = parser;
+    // @ts-ignore
+    private services: ParserService & {
+        [serviceName: string]: any
+    } = {}
+    registerService(serviceName: keyof ParserService, serviceObj: any):void {
+        this.services[serviceName] = serviceObj;
+    }
+    getService<T extends keyof ParserService>(serviceName: T): ParserService[T] {
+        return this.services[serviceName];
     }
 }

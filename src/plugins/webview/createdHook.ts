@@ -1,8 +1,8 @@
 import { WebviewListenerParams } from "../../interface";
 import Parser from "../../model/Parser";
-export default function initBodyCreateJs({webViewHooks, webview, webviewListenerHook}: Parser) {
+export default function initBodyCreateJs({webViewHooks, webview}: Parser) {
     webViewHooks.vueHooks.createdHook.tapPromise('webviewListener', async (createds: string[][]) => {
-        const listeners = webviewListenerHook.call([]);
+        const listeners = await webViewHooks.listenerHook.promise([]);
         return createds.concat([
             [
                 `
