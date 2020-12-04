@@ -75,7 +75,7 @@ class SidebarWebview {
     sendErrorNode(errorNode: BaseErrorNode) {
         this.triggerWebviewListener('onErrorNode', errorNode);
     }
-    addWebviewListener(name: string, functionConstructorParams: any[]) {
+    addWebviewListener(name: string, functionConstructorParams: string[]) {
         this.parser?.webViewHooks.listenerHook.tapPromise(name, async (listeners: WebviewListenerParams[]) => {
             return listeners.concat([
                 {

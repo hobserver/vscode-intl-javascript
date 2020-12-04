@@ -1,5 +1,5 @@
 import { HoverParams, ParseFileParam } from '../interface';
-import Parser from '../model/Parser';
+import Parser from './Parser';
 import utils from '../utils/index';
 import * as vscode from 'vscode';
 var readfiles = require('node-readfiles');

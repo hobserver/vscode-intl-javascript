@@ -16,6 +16,7 @@
     "onLanguage:typescriptreact"
   ],
   "main": "./out/extension.js",
+  "types": "./src/index.d.ts",
   "contributes": {
     "commands": [
       {
