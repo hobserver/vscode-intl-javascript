@@ -45,7 +45,7 @@ export default class WebViewPlugin {
         webViewHooks.metaHook.tapPromise('meta', async (metaArr: string[]) => {
             return metaArr;
         });
-        webViewHooks.headHook.tapPromise('headers', async (header: [string]) => {
+        webViewHooks.headHook.tapPromise('headers', async (header: string[]) => {
             var jsArr = await webViewHooks.jsHook.promise([]);
             var cssArr = await webViewHooks.cssHook.promise([]);
             var metaArr = await webViewHooks.metaHook.promise([]);

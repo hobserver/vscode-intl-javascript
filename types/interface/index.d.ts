@@ -2,9 +2,13 @@ import Parser from "../model/Parser";
 import * as vscode from 'vscode';
 import MenuCommand from "../plugins/menu-command/MenuCommand";
 export declare type LangKey = 'zh_CN' | 'zh_TW';
+export { Parser };
 export interface ParserService {
     menuCommand: MenuCommand;
 }
+export declare type IntlStorageStoreHookCallback = (key: string, texts: {
+    [langKey in LangKey]: string;
+}) => void;
 export interface StorageAddParams {
     key: string;
     text: string;

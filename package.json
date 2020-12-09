@@ -16,7 +16,7 @@
     "onLanguage:typescriptreact"
   ],
   "main": "./out/extension.js",
-  "types": "./src/index.d.ts",
+  "types": "./types/interface/index.d.ts",
   "contributes": {
     "commands": [
       {
@@ -26,12 +26,6 @@
     ],
     "menus": {
       "editor/context": [
-        {
-          "when": "resourceLangId == javascript",
-          "command": "vscode-intl-javascript.helloWorld",
-          "alt": "vscode-intl-javascript.helloWorld",
-          "group": "navigation"
-        }
       ]
     },
     "configuration": {
@@ -58,6 +52,7 @@
     "@types/glob": "^7.1.3",
     "@types/mocha": "^8.0.0",
     "@types/node": "^12.11.7",
+    "@types/tapable": "^1.0.6",
     "@types/vscode": "^1.50.0",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
     "@typescript-eslint/parser": "^4.1.1",

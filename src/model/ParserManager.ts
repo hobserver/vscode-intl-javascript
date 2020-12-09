@@ -5,9 +5,17 @@ import * as vscode from 'vscode';
 var readfiles = require('node-readfiles');
 import * as path from 'path';
 class ParserManger {
+    static instance: ParserManger
     caches: {
         [filepath: string]: Parser
     } = {};
+    static getSingleInstance(): ParserManger {
+        if (ParserManger.instance) {
+            return ParserManger.instance;
+        }
+        ParserManger.instance = new ParserManger();
+        return ParserManger.instance;
+    }
     parseCurrentFile() {
         const filePath = utils.getCurrentFilePath();
         if (filePath) {
@@ -67,5 +75,4 @@ class ParserManger {
         return errorHoverMenus;
     }
 }
-const parserManager = new ParserManger();
-export default parserManager;
+export default ParserManger;

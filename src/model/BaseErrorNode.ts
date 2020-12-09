@@ -71,7 +71,7 @@ export default class {
     appendLog(log: string) {
         this.parser.utils.outputChannel.appendLine(log);
     }
-    replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
+    async replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
         var addParams: StorageAddParams[] = [];
         errorInfo.langs.forEach(item => {
             if (item.value) {
@@ -82,7 +82,7 @@ export default class {
                 });
             }
         });
-        this.parser.intlStorage.storeKeyAndValues(addParams);
+        await this.parser.intlStorage.storeKeyAndValues(addParams);
         this._replace(this.start, this.end, text ? text : `intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')`);
     }
     putColor() {

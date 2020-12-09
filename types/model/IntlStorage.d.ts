@@ -1,11 +1,17 @@
-import { CheckResult, LangKey, StorageAddParams } from "../interface";
+import { CheckResult, IntlStorageStoreHookCallback, LangKey, StorageAddParams } from "../interface";
 import Config from "./Config";
+import { AsyncSeriesWaterfallHook } from 'tapable';
 declare type UpdateParam = {
     [langKey in LangKey]: {
         [key: string]: string;
     };
 };
+export interface DD {
+}
 export default class IntlStorage {
+    hooks: {
+        storeKeyToFile: AsyncSeriesWaterfallHook<[IntlStorageStoreHookCallback[]]>;
+    };
     config: Config;
     constructor(config: Config);
     initLang(): void;

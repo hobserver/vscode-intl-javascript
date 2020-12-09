@@ -52,7 +52,7 @@ export default class HasKeyErrorNode extends BaseNode {
     getLog() {
 
     }
-    replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
+    async replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
         super.replaceAndSave(errorInfo, text ? text : `intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')`);
     }
     replaceAndSaveWithBrackets(errorInfo: MessageInfoResParams) {
@@ -72,7 +72,7 @@ export default class HasKeyErrorNode extends BaseNode {
                         this.firstErrorLang = langItem;
                     }
                     this.logs.push(langItem.name  + ' 缺少');
-                } else {
+                } else if (langKey === this.parser.config.getFirstLangKey()){
                     if (!checkItemResult.ananimous) {
                         this.logs.push(langItem?.name + ' 不一致');
                     }
@@ -145,15 +145,20 @@ export default class HasKeyErrorNode extends BaseNode {
         const {document} = activeEditor;
         if (document) {
             // 缺少那个，显示那个颜色，只有两个都满足才不会着色
-            
             if (this.checkResult) {
                 var isOK: boolean = true;
                 var firstErrorColor: string = 'red';
                 const checkResult = Object.keys(this.checkResult);
                 for (var i = 0; i < checkResult.length; i++) {
                     const langKey = checkResult[i];
-                    if (!(this.checkResult[langKey].exist && this.checkResult[langKey].exist)) {
+                    if (i === 0) {
+                        if (!(this.checkResult[langKey].exist && this.checkResult[langKey].ananimous)) {
+                            isOK = false;
+                        }
+                    } else if (!this.checkResult[langKey].exist) {
                         isOK = false;
+                    }
+                    if (!isOK) {
                         firstErrorColor = this.parser.config.langMap[langKey as LangKey].color;
                         break;
                     }

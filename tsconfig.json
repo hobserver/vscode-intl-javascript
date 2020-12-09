@@ -2,13 +2,13 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "es6",
+		"declaration": true,
+		"declarationDir": "./types",
 		"outDir": "out",
 		"lib": [
 			"es6"
 		],
 		"sourceMap": true,
-		"declaration": true,
-		"declarationDir": "types",
 		"rootDir": "src",
 		"strict": true   /* enable all strict type-checking options */
 		/* Additional Checks */

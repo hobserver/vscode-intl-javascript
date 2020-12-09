@@ -34,20 +34,20 @@ export default class NoKeyErrorNode extends BaseNode {
         });
         this.registerCommand(command.HardCode_Haskey, async ({errorNodeId, key}: GlobalCommandParam) => {
             if (this.id === errorNodeId) {
-                this._replace(this.start, this.end, `intl.get(${key}).d('${this.extraParams.text}')`);
+                this._replace(this.start, this.end, `intl.get('${key}').d('${this.extraParams.text}')`);
             }
         });
         this.registerCommand(command.HardCode_Haskey_With_Brackets, async ({errorNodeId, key}: GlobalCommandParam) => {
             if (this.id === errorNodeId) {
-                this._replace(this.start, this.end, `{intl.get(${key}).d('${this.extraParams.text}')}`);
+                this._replace(this.start, this.end, `{intl.get('${key}').d('${this.extraParams.text}')}`);
             }
         });
     }
-    replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
-        super.replaceAndSave(errorInfo, text ? text : `intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')`);
+    async replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
+        await super.replaceAndSave(errorInfo, text ? text : `intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')`);
     }
-    replaceAndSaveWithBrackets(errorInfo: MessageInfoResParams) {
-        this.replaceAndSave(errorInfo, `{intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')}`);
+    async replaceAndSaveWithBrackets(errorInfo: MessageInfoResParams) {
+        await this.replaceAndSave(errorInfo, `{intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')}`);
     }
     showMenu({
         position,

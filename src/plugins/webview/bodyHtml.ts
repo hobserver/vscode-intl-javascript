@@ -5,7 +5,7 @@ export default function initBodyJs(parser: Parser) {
     const {webViewHooks} = parser;
     initBodyHeaderJs(parser);
     initBodyFooterJs(parser);
-    webViewHooks.bodyHtmlHook.tapPromise('body', async (bodyArr: [string]) => {
+    webViewHooks.bodyHtmlHook.tapPromise('body', async (bodyArr: string[]) => {
         const headerJs = await webViewHooks.bodyHeaderJsHook.promise([]);
         const footerJs = await webViewHooks.bodyFooterJsHook.promise([]);
         return headerJs.concat(bodyArr).concat([

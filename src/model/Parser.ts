@@ -1,29 +1,30 @@
 const babelCore = require('@babel/core');
 import * as vscode from 'vscode';
+import * as path from 'path';
 import BaseErrorNode from './BaseErrorNode';
 import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import utils from '../utils/index';
 import Service from './Service';
-import { ParseFileParam } from '../interface';
+import { MessageInfoSendParams, ParseFileParam, WebviewListenerParams } from '../interface';
 import WebViewPlugin from '../plugins/webview/index';
 import CommandPlugin from '../plugins/menu-command/index';
-import webview from './WebView';
-import parserManager from './ParserManager';
+import SidebarWebview from './WebView';
+import ParserManager from './ParserManager';
 import noCacheRequire from '../utils/no-cache-require';
-const {
+import {
     SyncWaterfallHook,
     SyncHook,
     HookMap,
     AsyncParallelHook,
     AsyncSeriesWaterfallHook
- } = require("tapable");
+} from 'tapable';
 export default class Parser extends Service {
-    public parserManager = parserManager;
+    public parserManager: ParserManager;
     private _prevDecorations: vscode.TextEditorDecorationType[]  = [];
     public utils = utils;
     public plugins: any = [] // 可以传入对象，也可以传入数组
-    public webview = webview;
+    public webview: SidebarWebview;
     public decorations: {
         [color: string]: (vscode.Range | vscode.DecorationOptions)[]
     } = {};
@@ -34,35 +35,41 @@ export default class Parser extends Service {
     public config: Config
     // @ts-ignore
     public babelHooks: {
-        babelPresetHook: typeof SyncWaterfallHook
-        babelPluginHook: typeof SyncWaterfallHook
+        babelPresetHook: SyncWaterfallHook<[string[]]>,
+        babelPluginHook: SyncWaterfallHook<[string[]]>
     }
      // @ts-ignore
-    public processListenerHook: typeof HookMap
+    public processListenerHook: HookMap<AsyncParallelHook<[any]>>
      // @ts-ignore
     public webViewHooks: {
-        htmlHook: typeof AsyncSeriesWaterfallHook,
-        titleHook: typeof AsyncSeriesWaterfallHook,
-        headHook: typeof AsyncSeriesWaterfallHook,
-        jsHook: typeof AsyncSeriesWaterfallHook,
-        metaHook: typeof AsyncSeriesWaterfallHook,
-        cssHook: typeof AsyncSeriesWaterfallHook,
-        bodyHtmlHook: typeof AsyncSeriesWaterfallHook,
-        btnHook: typeof AsyncSeriesWaterfallHook,
-        bodyFooterJsHook: typeof AsyncSeriesWaterfallHook,
-        bodyHeaderJsHook: typeof AsyncSeriesWaterfallHook,
-        listenerHook: typeof AsyncSeriesWaterfallHook,
-        sendLangInfoHook: typeof AsyncSeriesWaterfallHook,
+        htmlHook: AsyncSeriesWaterfallHook<[string]>,
+        titleHook: AsyncSeriesWaterfallHook<[string]>,
+        headHook: AsyncSeriesWaterfallHook<[string[]]>,
+        jsHook: AsyncSeriesWaterfallHook<[string[]]>,
+        metaHook: AsyncSeriesWaterfallHook<[string[]]>,
+        cssHook: AsyncSeriesWaterfallHook<[string[]]>,
+        bodyHtmlHook: AsyncSeriesWaterfallHook<[string[]]>,
+        btnHook: AsyncSeriesWaterfallHook<[string[]]>,
+        bodyFooterJsHook: AsyncSeriesWaterfallHook<[string[]]>,
+        bodyHeaderJsHook: AsyncSeriesWaterfallHook<[string[]]>,
+        listenerHook: AsyncSeriesWaterfallHook<[WebviewListenerParams[]]>,
+        sendLangInfoHook: AsyncSeriesWaterfallHook<[MessageInfoSendParams, BaseErrorNode, Parser?]>,
         vueHooks: {
-            createdHook: typeof AsyncSeriesWaterfallHook,
-            methodsHook: typeof AsyncSeriesWaterfallHook,
+            createdHook: AsyncSeriesWaterfallHook<[string[][]]>,
+            methodsHook: AsyncSeriesWaterfallHook<[WebviewListenerParams[]]>,
         }
     }
     public intlStorage: IntlStorage
     public filepath: string
     private isComplete: boolean = true;
+    parserCatch = (err: any) => {
+        vscode.window.showWarningMessage(err.toString());
+        this.isComplete = true;
+    }
     constructor (filepath: string) {
         super();
+        this.parserManager = ParserManager.getSingleInstance();
+        this.webview = SidebarWebview.getSingleInstance();
         this.filepath = filepath;
         this.config = new Config(this, filepath);
         this.intlStorage = new IntlStorage(this.config);
@@ -78,7 +85,7 @@ export default class Parser extends Service {
                 if (!path.isAbsolute(PluginClassPath)) {
                     throw(new Error('请提供插件的绝对路径'));
                 } else {
-                    const PluginClass = noCacheRequire(PluginClassPath);
+                    const PluginClass = noCacheRequire(PluginClassPath).default;
                     const pluginInstance = new PluginClass(option);
                     await pluginInstance.apply(this);
                 }
@@ -108,7 +115,7 @@ export default class Parser extends Service {
                 methodsHook: new AsyncSeriesWaterfallHook(['methods']),
             }
         };
-        this.processListenerHook = new HookMap((type: string) => new AsyncParallelHook(["params"]));;
+        this.processListenerHook = new HookMap((type: string) => new AsyncParallelHook(["params"]));
     }
     public addDecoration(color: string, range: vscode.Range | vscode.DecorationOptions) {
         if (!this.decorations[color]) {
@@ -136,11 +143,11 @@ export default class Parser extends Service {
     }: ParseFileParam) {
         if (!this.isComplete) return Promise.reject();
         if (!isShowLog && !isPutColor) return Promise.reject();
-       
         this.isComplete = false;
         try {
             this.resetDataForConfig(); // 重置缓存对象
             await this.config.init();
+            await this.intlStorage.initLang();
             await this.handlePlugins();
             this.webview.setParser(this);
             await this.babelParser();
@@ -152,8 +159,8 @@ export default class Parser extends Service {
             }
             this.isComplete = true;
         } catch (err) {
-            vscode.window.showWarningMessage(`解析失败 - ${this.filepath}`);
             this.isComplete = true;
+            vscode.window.showWarningMessage(`解析失败 - ${this.filepath}` + err.toString());
             return Promise.reject();
         }
     }
@@ -201,6 +208,7 @@ export default class Parser extends Service {
                 plugins: this.babelHooks.babelPluginHook.call([])
             }, (err: any) => {
                 if (err) {
+                    this.isComplete = true;
                     vscode.window.showWarningMessage(`${this.filepath} - Babel解析失败` + err.stack);
                     rejects();
                 } else {
@@ -209,5 +217,4 @@ export default class Parser extends Service {
             });
         })
     }
-    
 }

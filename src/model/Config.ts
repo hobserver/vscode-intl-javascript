@@ -28,16 +28,12 @@ export default class {
     }
     init() {
         // 找文件
-        return new Promise((resolve, reject) => {
-            const configFile = this.findConfigFile();
-            if (configFile) {
-                this.handleConfigFile(configFile).then(() => {
-                    resolve(this);
-                });
-            } else {
-                reject();
-            }
-        });
+        const configFile = this.findConfigFile();
+        if (configFile) {
+            return this.handleConfigFile(configFile);
+        } else {
+            return Promise.reject();
+        }
     }
     getFirstLangKey() {
         return this.langs[0].key;
@@ -79,7 +75,7 @@ export default class {
         if (config.fileExt) {
             this.fileExt = config.fileExt;
         }
-        const tempLocal = path.join(path.dirname(configFile), '.locale');
+        const tempLocal = path.join(path.dirname(configFile), 'locale');
         if (!fs.existsSync(tempLocal)) {
             fs.mkdirSync(tempLocal);
         }

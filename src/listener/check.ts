@@ -1,10 +1,10 @@
 import { ExtensionContext, window } from "vscode";
 import * as vscode from "vscode";
 import * as path from 'path';
-import parserManager from '../model/ParserManager';
+import ParserManager from '../model/ParserManager';
 import utils from "../utils";
 function update() {
-    parserManager.parseCurrentFile();
+    ParserManager.getSingleInstance().parseCurrentFile();
 }
 export default function init(context: ExtensionContext) {
     context.subscriptions.push(window.onDidChangeActiveTextEditor(() => {
@@ -34,7 +34,7 @@ export default function init(context: ExtensionContext) {
             value: currentDir,
             valueSelection: [currentDir.lastIndexOf('/'), currentDir.length]
         }).then((dir: any) => {
-            parserManager.parseDir(currentDir); 
+            ParserManager.getSingleInstance().parseDir(currentDir); 
         });
     }));
 }

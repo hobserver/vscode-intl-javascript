@@ -13,7 +13,6 @@ export default function initBodyJs(parser: Parser) {
     htmlBtns.forEach((item) => {
         window.htmlBtnCallbacks[item.key] = new Function(...item.functionConstructorParams);
     });
-    console.log(window.htmlBtnCallbacks);
 })();
 </script>
             `

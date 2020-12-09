@@ -6,6 +6,14 @@ import BaseErrorNode from "./BaseErrorNode";
 import Parser from "./Parser";
 import { WebviewListenerParams } from "../interface";
 class SidebarWebview {
+    static instance: SidebarWebview;
+    static getSingleInstance () {
+        if (SidebarWebview.instance) {
+            return SidebarWebview.instance;
+        }
+        SidebarWebview.instance = new SidebarWebview();
+        return SidebarWebview.instance;
+    }
     callbackCaches: {
         [callbackName: string]: (...args: any[]) => any
     } = {}
@@ -35,7 +43,7 @@ class SidebarWebview {
         const {webview} = this.panel;
         if (utils.extension) {
             const html = await this.parser?.webViewHooks.htmlHook.promise('');
-            webview.html = html;
+            webview.html = html as string;
             webview.onDidReceiveMessage(this.onMessage.bind(this));
             await new Promise(resolve => {
                 var _run = () => {
@@ -112,4 +120,4 @@ class SidebarWebview {
         }
     }
 }
-export default new SidebarWebview();
+export default SidebarWebview;

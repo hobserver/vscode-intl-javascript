@@ -1,21 +1,28 @@
-import { CheckResult, Lang, LangKey, StorageAddParams } from "../interface";
+import { CheckResult, IntlStorageStoreHookCallback, Lang, LangKey, StorageAddParams } from "../interface";
 import Config from "./Config";
 const fs = require("fs");
 const path = require("path");
 import noCacheRequire from '../utils/no-cache-require';
+import {
+    AsyncSeriesWaterfallHook,
+    SyncHook,
+    SyncWaterfallHook
+} from 'tapable';
 type UpdateParam = {
     [langKey in LangKey]: {
         [key: string]: string
     }
 }
-
-class LangStorage {
-    
-}
 export default class IntlStorage {
+    public hooks: {
+        storeKeyToFile: AsyncSeriesWaterfallHook<[IntlStorageStoreHookCallback[]]>
+    }
     config: Config
     constructor(config: Config) {
         this.config = config;
+        this.hooks = {
+            storeKeyToFile: new AsyncSeriesWaterfallHook(['listeners'])
+        }
     }
     public initLang() {
         this.initFilesIfNotExist(this.config.langs);
@@ -34,10 +41,6 @@ export default class IntlStorage {
     } {
         const langFile = this.getLangFile(lang);
         const result = noCacheRequire(langFile);
-        console.log(result, result[key], key, text, result[key] === text, {
-            exist: !!result[key],
-            ananimous: result[key] === text
-        });
         return {
             exist: !!result[key],
             ananimous: result[key] === text
@@ -72,7 +75,7 @@ export default class IntlStorage {
         });
         return result;
     }
-    storeKeyAndValues(addParams: StorageAddParams[]) {
+    async storeKeyAndValues(addParams: StorageAddParams[]) {
         // 以lang为索引，合并key
         // @ts-ignore
         const langs: {
@@ -80,16 +83,37 @@ export default class IntlStorage {
                 [key: string]: string
             } 
         } = {};
+        const keyMap: {
+            [key: string]: {
+                [langKey in LangKey]: string
+            } 
+        } = {};
         addParams.forEach((addItem: StorageAddParams) => {
             if (!langs[addItem.lang]) {
                 langs[addItem.lang] = {};
             }
             langs[addItem.lang][addItem.key] = addItem.text;
+            if (!keyMap[addItem.key]) {
+                // @ts-ignore
+                keyMap[addItem.key] = {
+                    [addItem.lang]: addItem.text
+                };
+            } else {
+                keyMap[addItem.key][addItem.lang] = addItem.text;
+            }
         });
+        const listeners = await this.hooks.storeKeyToFile.promise([]);
+        const keys = Object.keys(keyMap);
+        for (var i = 0, len = keys.length; i < len; i++) {
+            for (var j = 0, jlen = listeners.length; j < jlen; j++) {
+                const callback = listeners[j];
+                await callback(keys[i], keyMap[keys[i]]);
+            }
+        }
         // @ts-ignore
-        Object.keys(langs).forEach((langKey: LangKey) => {
+        Object.keys(langs).forEach(async (langKey: LangKey) => {
             this.writeLangKeysToFile(langKey, langs[langKey]);
-        });;
+        });
     }
     writeLangKeysToFile(langLey: LangKey, keys: {
         [key: string]: string
