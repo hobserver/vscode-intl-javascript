@@ -3,7 +3,7 @@ import { Lang, LangKey } from '../interface';
 export default class {
     langs: Lang[];
     fileExt: string;
-    fileReg: {};
+    fileReg: RegExp;
     isCurrentFileLogError: boolean;
     localeDir: string | null;
     parser: Parser;
@@ -14,8 +14,8 @@ export default class {
     publisher: string;
     name: string;
     constructor(parser: Parser, filepath: string);
-    init(): any;
-    getFirstLangKey(): any;
+    init(): Promise<void>;
+    getFirstLangKey(): LangKey;
     findConfigFile(): string | null;
-    handleConfigFile(configFile: string): any;
+    handleConfigFile(configFile: string): Promise<void>;
 }

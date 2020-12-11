@@ -3,5 +3,5 @@ export default class WebViewPlugin {
     options: any;
     constructor(options?: any);
     initWebviewApi(parser: Parser): void;
-    apply(parser: Parser): any;
+    apply(parser: Parser): Promise<void>;
 }

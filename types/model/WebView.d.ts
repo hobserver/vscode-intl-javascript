@@ -11,7 +11,7 @@ declare class SidebarWebview {
     panel?: WebviewPanel;
     parser?: Parser;
     setParser(parser: Parser): void;
-    open(): unknown;
+    open(): Promise<undefined>;
     triggerWebviewListener(method: string, params: any, callback?: any): void;
     sendErrorNode(errorNode: BaseErrorNode): void;
     addWebviewListener(name: string, functionConstructorParams: string[]): void;

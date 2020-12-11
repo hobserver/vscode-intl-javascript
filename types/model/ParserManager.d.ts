@@ -9,7 +9,7 @@ declare class ParserManger {
     static getSingleInstance(): ParserManger;
     parseCurrentFile(): void;
     parseDir(dirName: string): any;
-    parseFile(filepath: string, { isPutColor, isShowLog }: ParseFileParam): unknown;
+    parseFile(filepath: string, { isPutColor, isShowLog }: ParseFileParam): Promise<undefined>;
     showHoverMenu(params: HoverParams): vscode.ProviderResult<vscode.Hover>;
 }
 export default ParserManger;

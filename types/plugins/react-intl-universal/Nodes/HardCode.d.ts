@@ -17,8 +17,8 @@ export default class NoKeyErrorNode extends BaseNode {
         };
         getMethod: string;
     });
-    replaceAndSave(errorInfo: MessageInfoResParams, text?: string): void;
-    replaceAndSaveWithBrackets(errorInfo: MessageInfoResParams): void;
+    replaceAndSave(errorInfo: MessageInfoResParams, text?: string): Promise<void>;
+    replaceAndSaveWithBrackets(errorInfo: MessageInfoResParams): Promise<void>;
     showMenu({ position, document, offset }: HoverParams): vscode.ProviderResult<vscode.Hover>;
     logError(): void;
 }

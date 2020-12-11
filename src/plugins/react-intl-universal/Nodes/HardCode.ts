@@ -1,6 +1,6 @@
 
 import BaseNode from '../../../model/BaseErrorNode';
-import {ErrorNodeParam, GlobalCommandParam, HoverParams, Lang, MessageInfoResParams, StorageAddParams} from '../../../interface';
+import {ErrorNodeParam, HoverMenuCommandParam, HoverParams, Lang, MessageInfoResParams, StorageAddParams} from '../../../interface';
 import * as vscode from 'vscode';
 import command from '../command';
 export default class NoKeyErrorNode extends BaseNode {
@@ -16,7 +16,7 @@ export default class NoKeyErrorNode extends BaseNode {
         super(params);
         this.extraParams = extraParams;
         const { parser } = params;
-        this.registerCommand(command.open_webview, async ({errorNodeId}: GlobalCommandParam) => {
+        this.registerCommand(command.open_webview, async ({errorNodeId}: HoverMenuCommandParam) => {
             if (this.id === errorNodeId) {
                 await parser.webview.open();
                 await this.sendErrorNodoInfoToWebwiew({
@@ -32,12 +32,12 @@ export default class NoKeyErrorNode extends BaseNode {
                 });
             }
         });
-        this.registerCommand(command.HardCode_Haskey, async ({errorNodeId, key}: GlobalCommandParam) => {
+        this.registerCommand(command.HardCode_Haskey, async ({errorNodeId, key}: HoverMenuCommandParam) => {
             if (this.id === errorNodeId) {
                 this._replace(this.start, this.end, `intl.get('${key}').d('${this.extraParams.text}')`);
             }
         });
-        this.registerCommand(command.HardCode_Haskey_With_Brackets, async ({errorNodeId, key}: GlobalCommandParam) => {
+        this.registerCommand(command.HardCode_Haskey_With_Brackets, async ({errorNodeId, key}: HoverMenuCommandParam) => {
             if (this.id === errorNodeId) {
                 this._replace(this.start, this.end, `{intl.get('${key}').d('${this.extraParams.text}')}`);
             }

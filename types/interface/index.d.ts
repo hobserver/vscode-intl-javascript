@@ -1,10 +1,12 @@
 import Parser from "../model/Parser";
 import * as vscode from 'vscode';
-import MenuCommand from "../plugins/menu-command/MenuCommand";
-export declare type LangKey = 'zh_CN' | 'zh_TW';
+import CommonCommand from "../model/CommonCommand";
+import ConfigCommonCommand from "../plugins/config-menu-command/ConfigMenuCommand";
+export declare type LangKey = 'zh_CN' | 'en_US' | 'zh_TW';
 export { Parser };
 export interface ParserService {
-    menuCommand: MenuCommand;
+    configMenuCommand: ConfigCommonCommand;
+    hoverMenuCommand: CommonCommand<HoverMenuCommandParam>;
 }
 export declare type IntlStorageStoreHookCallback = (key: string, texts: {
     [langKey in LangKey]: string;
@@ -29,15 +31,16 @@ export interface MessageInfoSendParams {
 }
 export interface MessageInfoResParams extends MessageInfoSendParams {
 }
-export interface GlobalCommandParam {
+export interface CommonCommandParam {
     filePath: string;
     command: string;
-    errorNodeId: any;
-    [other: string]: any;
 }
-export interface GlobalCommandMenuItem {
+export interface HoverMenuCommandParam extends CommonCommandParam {
+    errorNodeId: any;
+}
+export interface HoverCommandMenuItem {
     name: string;
-    params: GlobalCommandParam;
+    params: HoverMenuCommandParam;
 }
 export interface HoverParams {
     document: vscode.TextDocument;

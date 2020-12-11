@@ -6,8 +6,6 @@ declare type UpdateParam = {
         [key: string]: string;
     };
 };
-export interface DD {
-}
 export default class IntlStorage {
     hooks: {
         storeKeyToFile: AsyncSeriesWaterfallHook<[IntlStorageStoreHookCallback[]]>;
@@ -23,7 +21,7 @@ export default class IntlStorage {
     getValueKeyInLang(value: string, lang: LangKey): string | null;
     checkKey(key: string, text?: string): CheckResult;
     getValueKey(value: string): CheckResult;
-    storeKeyAndValues(addParams: StorageAddParams[]): void;
+    storeKeyAndValues(addParams: StorageAddParams[]): Promise<void>;
     writeLangKeysToFile(langLey: LangKey, keys: {
         [key: string]: string;
     }, isWhoile?: boolean): void;

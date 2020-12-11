@@ -1,4 +1,4 @@
-import { GlobalCommandParam, ParserService } from '../interface';
+import { ParserService } from '../interface';
 export default class Service {
     // @ts-ignore
     private services: ParserService & {

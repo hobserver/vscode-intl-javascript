@@ -12,7 +12,7 @@ declare const _default: {
         parser?: Parser | undefined;
         intlStorage?: IntlStorage | undefined;
         apply(parser: Parser): void;
-        getNodeValue(node: any): any;
+        getNodeValue(node: any): string;
         checkNode(nodePath: any): void;
     };
 };

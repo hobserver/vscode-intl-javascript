@@ -25,7 +25,7 @@ export default class HasKeyErrorNode extends BaseNode {
         params?: any;
     });
     getLog(): void;
-    replaceAndSave(errorInfo: MessageInfoResParams, text?: string): void;
+    replaceAndSave(errorInfo: MessageInfoResParams, text?: string): Promise<void>;
     replaceAndSaveWithBrackets(errorInfo: MessageInfoResParams): void;
     check(): void;
     logError(): void;

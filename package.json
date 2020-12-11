@@ -22,10 +22,29 @@
       {
         "command": "vscode-intl-javascript.CHECK_DIR_LOCALE",
         "title": "Check-文件夹国际化"
+      },
+      {
+        "command": "vscode-intl-javascript.show_config_command_list",
+        "title": "show command list",
+        "icon": {
+          "light": "./static/menu_dark.svg",
+          "dark": "./static/menu_dark.svg"
+        }
       }
     ],
     "menus": {
-      "editor/context": [
+      "editor/title": [
+        {
+          "when": "resourceFilename == intl.config.js",
+          "command": "vscode-intl-javascript.show_config_command_list",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "vscode-intl-javascript.show_config_command_list",
+          "when": "editorHasSelection"
+        }
       ]
     },
     "configuration": {

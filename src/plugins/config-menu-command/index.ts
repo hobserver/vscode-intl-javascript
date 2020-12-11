@@ -1,11 +1,12 @@
 import Parser from '../../model/Parser';
-import MenuCommand from './MenuCommand';
+import ConfigMenuCommand from './ConfigMenuCommand';
+import { CommonCommandParam } from '../../interface';
 export default class CommandPlugin {
     options
     constructor(options?: any) {
         this.options = options;
     }
     apply(parser: Parser) {
-        parser.registerService('menuCommand', new MenuCommand(parser));
+        parser.registerService('configMenuCommand', new ConfigMenuCommand(parser));
     }
 }

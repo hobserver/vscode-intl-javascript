@@ -8,7 +8,8 @@ import utils from '../utils/index';
 import Service from './Service';
 import { MessageInfoSendParams, ParseFileParam, WebviewListenerParams } from '../interface';
 import WebViewPlugin from '../plugins/webview/index';
-import CommandPlugin from '../plugins/menu-command/index';
+import HoverCommandPlugin from '../plugins/hover-menu-command/index';
+import ConfigCommandPlugin from '../plugins/config-menu-command/index';
 import SidebarWebview from './WebView';
 import ParserManager from './ParserManager';
 import noCacheRequire from '../utils/no-cache-require';
@@ -167,8 +168,9 @@ export default class Parser extends Service {
     private resetDataForConfig() {
         this.errors = [];
         this.plugins = [
-            new CommandPlugin(),
-            new WebViewPlugin()
+            new ConfigCommandPlugin(),
+            new HoverCommandPlugin(),
+            new WebViewPlugin(),
         ];
         this.decorations = {};
         this._prevDecorations.forEach(decoration => {

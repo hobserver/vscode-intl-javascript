@@ -1,5 +1,5 @@
 
-import { GlobalCommandParam, MessageInfoResParams } from '../../interface';
+import { MessageInfoResParams } from '../../interface';
 import BaseErrorNode from '../../model/BaseErrorNode';
 import Config from '../../model/Config';
 import IntlStorage from '../../model/IntlStorage';
@@ -9,7 +9,6 @@ var generate = require('@babel/generator');
 const path = require('path');
 const t = require("@babel/types");
 import HardCodeErrorNode from './Nodes/HardCode';
-import command from './command';
 export = class {
     options: {
         defaultLangReg: RegExp
@@ -26,7 +25,6 @@ export = class {
     apply(parser: Parser) {
         this.config = parser.config;
         this.parser = parser;
-        const commandSerivce = this.parser?.getService('menuCommand');
         const {babelHooks, intlStorage, webViewHooks} = parser;
         this.intlStorage = intlStorage;
         babelHooks.babelPluginHook.tap('plugin', ((plugins: any[]) => {

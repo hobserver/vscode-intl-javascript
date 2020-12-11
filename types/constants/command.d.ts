@@ -1,3 +1,4 @@
 export declare const Commands: {
-    GlobalCallback: string;
+    HoverMenu: string;
+    ConfigMenu: string;
 };

@@ -57,13 +57,13 @@ export default class Parser extends Service {
     private isComplete;
     parserCatch: (err: any) => void;
     constructor(filepath: string);
-    handlePlugins(): any;
+    handlePlugins(): Promise<void>;
     initHooks(): void;
     addDecoration(color: string, range: vscode.Range | vscode.DecorationOptions): void;
     pushError(errorNode: BaseErrorNode): void;
-    parse({ isPutColor, isShowLog }: ParseFileParam): unknown;
+    parse({ isPutColor, isShowLog }: ParseFileParam): Promise<undefined>;
     private resetDataForConfig;
-    logErrors(isClear: boolean): any;
-    putColors(): any;
+    logErrors(isClear: boolean): Promise<void>;
+    putColors(): Promise<void>;
     private babelParser;
 }

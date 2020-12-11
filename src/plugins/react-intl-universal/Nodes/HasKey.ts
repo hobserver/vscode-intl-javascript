@@ -1,6 +1,6 @@
 
 import BaseNode from '../../../model/BaseErrorNode';
-import { ErrorNodeParam, LangKey, CheckResult, GlobalCommandMenuItem, Lang, HoverParams, GlobalCommandParam, MessageInfoResParams} from '../../../interface';
+import { ErrorNodeParam, LangKey, CheckResult, HoverCommandMenuItem, Lang, HoverParams, HoverMenuCommandParam, MessageInfoResParams} from '../../../interface';
 import * as vscode from 'vscode';
 import command from '../command';
 export default class HasKeyErrorNode extends BaseNode {
@@ -20,7 +20,7 @@ export default class HasKeyErrorNode extends BaseNode {
     }) {
         super(position);
         this.extraParams = extraParams;
-        this.registerCommand(command.open_webview, async ({errorNodeId}: GlobalCommandParam) => {
+        this.registerCommand(command.open_webview, async ({errorNodeId}: HoverMenuCommandParam) => {
             if (this.id === errorNodeId) {
                 await this.parser.webview.open();
                 await this.sendErrorNodoInfoToWebwiew({
@@ -36,13 +36,13 @@ export default class HasKeyErrorNode extends BaseNode {
                 });
             }
         });
-        this.registerCommand(command.replace_value_to_key, async ({errorNodeId, key}: GlobalCommandParam) => {
+        this.registerCommand(command.replace_value_to_key, async ({errorNodeId, key}: HoverMenuCommandParam) => {
             if (this.id === errorNodeId) {
                 this._replace(this.extraParams.textStart, this.extraParams.textEnd,
                     "'" + this.parser.intlStorage.getKeyInLang(key, this.parser.config.getFirstLangKey()) + "'");
             }
         });
-        this.registerCommand(command.replace_key_to_value_key, async ({errorNodeId, key}: GlobalCommandParam) => {
+        this.registerCommand(command.replace_key_to_value_key, async ({errorNodeId, key}: HoverMenuCommandParam) => {
             if (this.id === errorNodeId) {
                 this._replace(this.extraParams.keyStart, this.extraParams.keyEnd,
                     "'" + this.parser.intlStorage.getValueKeyInLang(this.extraParams.text, this.parser.config.getFirstLangKey()) + "'");
@@ -94,7 +94,7 @@ export default class HasKeyErrorNode extends BaseNode {
         if (offset > this.start && offset < this.end) {
             // 查看key是否存在
             const keyResult = this.parser.intlStorage.checkKey(this.extraParams.key, this.extraParams.text);
-            var menus: GlobalCommandMenuItem[] = [
+            var menus: HoverCommandMenuItem[] = [
                 {
                     name: '打开编辑界面',
                     params: {

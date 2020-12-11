@@ -1,14 +1,19 @@
-import { GlobalCommandParam } from '../../interface';
-import Parser from '../../model/Parser';
-export default class Command {
+import Parser from './Parser';
+export default class CommandCommand<CommandParams> {
     private parser: Parser
     public listeners: {
-        [command: string]: ((params: GlobalCommandParam) => void)[]
+        [command: string]: ((params: CommandParams) => void)[]
     } = {}
     constructor (parser: Parser) {
         this.parser = parser;
     }
-    registerCommand(command: string, callback: (params: GlobalCommandParam) => void, isOnly = false) {
+    triggerCommand(command: string, params: any) {
+        const listeners = this.listeners[command];
+        for (var i = 0; i < listeners.length; i++) {
+            listeners[i](params);
+        }
+    }
+    registerCommand(command: string, callback: (params: CommandParams) => void, isOnly = false) {
         if (isOnly) {
             this.listeners[command] = [callback];
         } else {
@@ -22,7 +27,7 @@ export default class Command {
             }
         }
     }
-    removeCommand(command: string, callback: ((params: GlobalCommandParam) => void) | boolean, isOnly = false) {
+    removeCommand(command: string, callback: ((params: CommandParams) => void) | boolean, isOnly = false) {
         if (typeof callback === 'boolean') {
             isOnly = true;
         }

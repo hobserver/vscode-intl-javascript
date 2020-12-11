@@ -1,4 +1,7 @@
-import {ErrorNodeParam, MessageInfoSendParams, GlobalCommandMenuItem, HoverParams, LangKey, MessageInfoResParams, StorageAddParams, GlobalCommandParam} from '../interface';
+import {ErrorNodeParam, MessageInfoSendParams,
+    HoverCommandMenuItem, HoverParams,
+    LangKey, MessageInfoResParams,
+    StorageAddParams, HoverMenuCommandParam} from '../interface';
 import * as vscode from 'vscode';
 import Parser from './Parser';
 var uuid = require('node-uuid');
@@ -36,12 +39,12 @@ export default class {
         this.endCol = endCol;
         this.id = md5(this.filepath + this.start + this.end);
     }
-    registerCommand(commandId: string, callback: ({errorNodeId}: GlobalCommandParam) => void) {
-        const commandSerivce = this.parser.getService('menuCommand');
+    registerCommand(commandId: string, callback: ({errorNodeId}: HoverMenuCommandParam) => void) {
+        const commandSerivce = this.parser.getService('hoverMenuCommand');
         commandSerivce.registerCommand(commandId + this.id, callback, true);
     }
-    removeCommand(commandId: string, callback: ({errorNodeId}: GlobalCommandParam) => void) {
-        const commandSerivce = this.parser.getService('menuCommand');
+    removeCommand(commandId: string, callback: ({errorNodeId}: HoverMenuCommandParam) => void) {
+        const commandSerivce = this.parser.getService('hoverMenuCommand');
         commandSerivce.removeCommand(commandId, true);
     }
     sendErrorNodoInfoToWebwiew(params: MessageInfoSendParams) {
@@ -59,10 +62,10 @@ export default class {
     getCommandUrl(commandKey: any, params: any) {
         return `command:${commandKey}?${encodeURIComponent(JSON.stringify(params))}`
     }
-    createHoverCommandMenu(menus: GlobalCommandMenuItem[]) {
-        const commands = menus.map((item: GlobalCommandMenuItem) => {
+    createHoverCommandMenu(menus: HoverCommandMenuItem[]) {
+        const commands = menus.map((item: HoverCommandMenuItem) => {
             item.params.command = item.params.command + item.params.errorNodeId;
-            return `- [${item.name}](${this.getCommandUrl(Commands.GlobalCallback, item.params)})`;
+            return `- [${item.name}](${this.getCommandUrl(Commands.HoverMenu, item.params)})`;
         });
         const markdown = new vscode.MarkdownString(commands.join('\n'));
         markdown.isTrusted = true;
