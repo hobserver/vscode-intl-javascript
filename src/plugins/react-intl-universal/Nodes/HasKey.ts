@@ -72,19 +72,24 @@ export default class HasKeyErrorNode extends BaseNode {
                         this.firstErrorLang = langItem;
                     }
                     this.logs.push(langItem.name  + ' 缺少');
+                    this.isRight = false;
                 } else if (langKey === this.parser.config.getFirstLangKey()){
                     if (!checkItemResult.ananimous) {
                         this.logs.push(langItem?.name + ' 不一致');
+                        this.isRight = false;
                     }
                 }
             }
         });
+        this.isCheck = true;
     }
     logError() {
         if (!this.isCheck) {
             this.check();
         }
-        this.appendLog(this.logs.join(',') + ' ' + this.getErrorLine());
+        if (this.logs.length > 0) {
+            this.appendLog(this.logs.join(',') + '：' + this.getErrorLine());
+        }
     }
     showMenu({
         position,

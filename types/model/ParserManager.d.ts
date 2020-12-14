@@ -1,4 +1,4 @@
-import { HoverParams, ParseFileParam } from '../interface';
+import { HoverParams } from '../interface';
 import Parser from './Parser';
 import * as vscode from 'vscode';
 declare class ParserManger {
@@ -6,10 +6,12 @@ declare class ParserManger {
     caches: {
         [filepath: string]: Parser;
     };
+    lastUpdateTime: number;
     static getSingleInstance(): ParserManger;
-    parseCurrentFile(): void;
+    handleTimerQueue(): Promise<void>;
+    parseCurrentFile(): Promise<Parser>;
     parseDir(dirName: string): any;
-    parseFile(filepath: string, { isPutColor, isShowLog }: ParseFileParam): Promise<undefined>;
+    parseFile(filepath: string): Promise<Parser>;
     showHoverMenu(params: HoverParams): vscode.ProviderResult<vscode.Hover>;
 }
 export default ParserManger;

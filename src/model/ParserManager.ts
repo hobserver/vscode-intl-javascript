@@ -1,4 +1,4 @@
-import { HoverParams, ParseFileParam } from '../interface';
+import { HoverParams } from '../interface';
 import Parser from './Parser';
 import utils from '../utils/index';
 import * as vscode from 'vscode';
@@ -9,6 +9,7 @@ class ParserManger {
     caches: {
         [filepath: string]: Parser
     } = {};
+    lastUpdateTime = new Date().getTime();
     static getSingleInstance(): ParserManger {
         if (ParserManger.instance) {
             return ParserManger.instance;
@@ -16,18 +17,28 @@ class ParserManger {
         ParserManger.instance = new ParserManger();
         return ParserManger.instance;
     }
-    parseCurrentFile() {
+    async handleTimerQueue() {
+        const filePath = utils.getCurrentFilePath();
+        const parser = this.caches[filePath];
+        if (new Date().getTime() - this.lastUpdateTime > 60 * 1000) {
+            const updateQueues = await parser.updateHook.promise([]);
+            for (var i = 0, len = updateQueues.length; i < len; i++) {
+                updateQueues[i]();
+            }
+        }
+    }
+    async parseCurrentFile(): Promise<Parser> {
         const filePath = utils.getCurrentFilePath();
         if (filePath) {
-            this.parseFile(filePath, {
-                isPutColor: true,
-                isShowLog: false
-            });
+            return this.parseFile(filePath);
+        } else {
+            return Promise.reject();
         }
     }
     parseDir(dirName: string) {
         utils.outputChannel.clear();
         // 获取所有文件，然后出个排查
+        var errorCount = 0;
         return readfiles(dirName, {
             filter: [
                 '*.ts',
@@ -41,11 +52,13 @@ class ParserManger {
             var index = 0;
             var run = () => {
                 const filename = path.join(dirName, files[index]);
-                this.parseFile(filename, {
-                    isPutColor: false,
-                    isShowLog: true
-                }).then(() => {
+                this.parseFile(filename).then((parser) => {
                     index++;
+                    errorCount = errorCount + parser.errorCount;
+                    if (errorCount > 200) {
+                        return;
+                    }
+                    parser.logErrors();
                     if (index < files.length) {
                         run();
                     }
@@ -54,14 +67,11 @@ class ParserManger {
             run();
         })
     }
-    parseFile(filepath: string, {
-        isPutColor = false,
-        isShowLog = true
-    }: ParseFileParam) {
+    parseFile(filepath: string) {
         if (!this.caches[filepath]) {
             this.caches[filepath] = new Parser(filepath);
         }
-        return this.caches[filepath].parse({isPutColor, isShowLog});
+        return this.caches[filepath].parse();
     }
     showHoverMenu(params: HoverParams): vscode.ProviderResult<vscode.Hover> {
         const fileName = params.document.fileName;

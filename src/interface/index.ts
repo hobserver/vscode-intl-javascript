@@ -33,6 +33,8 @@ export interface MessageInfoSendParams {
 export interface MessageInfoResParams extends MessageInfoSendParams {
 
 }
+export interface UpdateQueueParam {
+}
 export interface CommonCommandParam {
     filePath: string
     command: string
@@ -63,10 +65,7 @@ export interface ErrorNodeParam {
     endRow: number
     endCol: number
 }
-export interface ParseFileParam {
-    isPutColor?: boolean
-    isShowLog: boolean
-}
+
 export interface ErrorShowNode {
 }
 export interface SimplePositionParam {

@@ -7,14 +7,15 @@ export default {
         return `${config.publisher}.${config.name}`;
     },
     get extension(): vscode.Extension<any> {
-        console.log(extensions.getExtension(this.extensionId));
         // @ts-ignore
         return extensions.getExtension(this.extensionId);
     },
     activeTextEditor: vscode.TextEdit,
     outputChannel: vscode.window.createOutputChannel('this.config.name'),
     setActiveTextEditor(activeTextEditor: any) {
-        this.activeTextEditor = activeTextEditor;
+        if (activeTextEditor?.document?.fileName) {
+            this.activeTextEditor = activeTextEditor;
+        }
     },
     getActiveEditor(): any {
         if (this.activeTextEditor) {

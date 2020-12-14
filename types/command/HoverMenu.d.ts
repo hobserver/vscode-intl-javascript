@@ -1,2 +1,3 @@
 import * as vscode from 'vscode';
-export default function (ctx: vscode.ExtensionContext): void;
+declare const setHoverMenuCommand: (ctx: vscode.ExtensionContext) => void;
+export default setHoverMenuCommand;

@@ -3,7 +3,7 @@
   "publisher": "rongpingli",
   "displayName": "vscode-intl-javascript",
   "description": "vscode intl plugin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.50.0"
   },
@@ -20,8 +20,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "vscode-intl-javascript.CHECK_DIR_LOCALE",
-        "title": "Check-文件夹国际化"
+        "command": "vscode-intl-javascript.check_all_dir_files",
+        "title": "intl:检查文件夹下所有文件"
       },
       {
         "command": "vscode-intl-javascript.show_config_command_list",

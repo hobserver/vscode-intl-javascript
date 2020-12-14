@@ -2,6 +2,7 @@ import { ErrorNodeParam, MessageInfoSendParams, HoverCommandMenuItem, HoverParam
 import * as vscode from 'vscode';
 import Parser from './Parser';
 export default class {
+    isRight: boolean;
     id: string;
     parser: Parser;
     filepath: string;

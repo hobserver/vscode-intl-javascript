@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import {Commands} from '../constants/command';
 import { HoverMenuCommandParam } from '../interface';
 import ParserManager from '../model/ParserManager';
-export default function(ctx: vscode.ExtensionContext) {
+const setHoverMenuCommand = (ctx: vscode.ExtensionContext) => {
     ctx.subscriptions.push(vscode.commands.registerCommand(Commands.HoverMenu, (commandParams: HoverMenuCommandParam) => {
         const {filePath, command} = commandParams;
         const parser = ParserManager.getSingleInstance().caches[filePath];
@@ -14,3 +14,4 @@ export default function(ctx: vscode.ExtensionContext) {
         }
     }));
 }
+export default setHoverMenuCommand;

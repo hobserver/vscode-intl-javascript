@@ -10,6 +10,7 @@ var md5 = require('md5');
 import * as fs from 'fs';
 import { Commands } from '../constants/command';
 export default class {
+    isRight = true
     id: string
     parser: Parser
     filepath: string

@@ -17,5 +17,6 @@ export default class {
     init(): Promise<void>;
     getFirstLangKey(): LangKey;
     findConfigFile(): string | null;
+    getTempDir(configFile: string | null): Promise<string>;
     handleConfigFile(configFile: string): Promise<void>;
 }

@@ -14,6 +14,7 @@ export default class NoKeyErrorNode extends BaseNode {
         getMethod: string
     }) {
         super(params);
+        this.isRight = false;
         this.extraParams = extraParams;
         const { parser } = params;
         this.registerCommand(command.open_webview, async ({errorNodeId}: HoverMenuCommandParam) => {

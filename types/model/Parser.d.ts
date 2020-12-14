@@ -3,11 +3,12 @@ import BaseErrorNode from './BaseErrorNode';
 import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import Service from './Service';
-import { MessageInfoSendParams, ParseFileParam, WebviewListenerParams } from '../interface';
+import { MessageInfoSendParams, WebviewListenerParams } from '../interface';
 import SidebarWebview from './WebView';
 import ParserManager from './ParserManager';
 import { SyncWaterfallHook, HookMap, AsyncParallelHook, AsyncSeriesWaterfallHook } from 'tapable';
 export default class Parser extends Service {
+    errorCount: number;
     parserManager: ParserManager;
     private _prevDecorations;
     utils: {
@@ -33,6 +34,7 @@ export default class Parser extends Service {
         babelPresetHook: SyncWaterfallHook<[string[]]>;
         babelPluginHook: SyncWaterfallHook<[string[]]>;
     };
+    updateHook: AsyncSeriesWaterfallHook<[(() => void)[]]>;
     processListenerHook: HookMap<AsyncParallelHook<[any]>>;
     webViewHooks: {
         htmlHook: AsyncSeriesWaterfallHook<[string]>;
@@ -61,9 +63,9 @@ export default class Parser extends Service {
     initHooks(): void;
     addDecoration(color: string, range: vscode.Range | vscode.DecorationOptions): void;
     pushError(errorNode: BaseErrorNode): void;
-    parse({ isPutColor, isShowLog }: ParseFileParam): Promise<undefined>;
+    parse(): Promise<this>;
     private resetDataForConfig;
-    logErrors(isClear: boolean): Promise<void>;
+    logErrors(isClear?: boolean): Promise<void>;
     putColors(): Promise<void>;
     private babelParser;
 }

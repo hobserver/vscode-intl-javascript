@@ -31,9 +31,12 @@ export interface MessageInfoSendParams {
 }
 export interface MessageInfoResParams extends MessageInfoSendParams {
 }
+export interface UpdateQueueParam {
+}
 export interface CommonCommandParam {
     filePath: string;
     command: string;
+    [other: string]: any;
 }
 export interface HoverMenuCommandParam extends CommonCommandParam {
     errorNodeId: any;
@@ -56,10 +59,6 @@ export interface ErrorNodeParam {
     startCol: number;
     endRow: number;
     endCol: number;
-}
-export interface ParseFileParam {
-    isPutColor?: boolean;
-    isShowLog: boolean;
 }
 export interface ErrorShowNode {
 }

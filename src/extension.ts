@@ -5,6 +5,8 @@ import checkListener from './listener/check';
 import hoverListener from './listener/hover';
 import registerHoverMenuCommand from './command/HoverMenu';
 import registerConfigMenuCommand from './command/ConfigMenu';
+import registerCheckAllFilesCommand from './command/CheckAllFiles';
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -26,6 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 	hoverListener(context);
 	registerHoverMenuCommand(context);
 	registerConfigMenuCommand(context);
+	registerCheckAllFilesCommand(context);
 	context.subscriptions.push(disposable);
 }
 

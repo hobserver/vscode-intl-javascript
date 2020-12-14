@@ -4,7 +4,11 @@ import * as path from 'path';
 import ParserManager from '../model/ParserManager';
 import utils from "../utils";
 function update() {
-    ParserManager.getSingleInstance().parseCurrentFile();
+    const parserManager = ParserManager.getSingleInstance();
+    parserManager.handleTimerQueue();
+    parserManager.parseCurrentFile().then((parser) => {
+        parser.putColors();
+    });
 }
 export default function init(context: ExtensionContext) {
     context.subscriptions.push(window.onDidChangeActiveTextEditor(() => {

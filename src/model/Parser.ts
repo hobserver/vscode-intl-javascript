@@ -6,7 +6,7 @@ import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import utils from '../utils/index';
 import Service from './Service';
-import { MessageInfoSendParams, ParseFileParam, WebviewListenerParams } from '../interface';
+import { MessageInfoSendParams, WebviewListenerParams } from '../interface';
 import WebViewPlugin from '../plugins/webview/index';
 import HoverCommandPlugin from '../plugins/hover-menu-command/index';
 import ConfigCommandPlugin from '../plugins/config-menu-command/index';
@@ -21,6 +21,7 @@ import {
     AsyncSeriesWaterfallHook
 } from 'tapable';
 export default class Parser extends Service {
+    public errorCount = 0;
     public parserManager: ParserManager;
     private _prevDecorations: vscode.TextEditorDecorationType[]  = [];
     public utils = utils;
@@ -39,6 +40,8 @@ export default class Parser extends Service {
         babelPresetHook: SyncWaterfallHook<[string[]]>,
         babelPluginHook: SyncWaterfallHook<[string[]]>
     }
+    // @ts-ignore
+    public updateHook: AsyncSeriesWaterfallHook<[(() => void)[]]>
      // @ts-ignore
     public processListenerHook: HookMap<AsyncParallelHook<[any]>>
      // @ts-ignore
@@ -116,6 +119,7 @@ export default class Parser extends Service {
                 methodsHook: new AsyncSeriesWaterfallHook(['methods']),
             }
         };
+        this.updateHook = new AsyncSeriesWaterfallHook(['updateQueues']);
         this.processListenerHook = new HookMap((type: string) => new AsyncParallelHook(["params"]));
     }
     public addDecoration(color: string, range: vscode.Range | vscode.DecorationOptions) {
@@ -138,12 +142,8 @@ export default class Parser extends Service {
         }
     }
     
-    public async parse({
-        isPutColor = false,
-        isShowLog = true
-    }: ParseFileParam) {
+    public async parse() {
         if (!this.isComplete) return Promise.reject();
-        if (!isShowLog && !isPutColor) return Promise.reject();
         this.isComplete = false;
         try {
             this.resetDataForConfig(); // 重置缓存对象
@@ -152,16 +152,11 @@ export default class Parser extends Service {
             await this.handlePlugins();
             this.webview.setParser(this);
             await this.babelParser();
-            if (isShowLog) {
-                await this.logErrors(isPutColor ? true : false);
-            }
-            if (isPutColor) {
-                await this.putColors();
-            }
             this.isComplete = true;
+            return this;
         } catch (err) {
             this.isComplete = true;
-            vscode.window.showWarningMessage(`解析失败 - ${this.filepath}` + err.toString());
+            vscode.window.showWarningMessage(`解析失败 - ${this.filepath}` + (err.stack || err.message || (err ? err.toString() : '')));
             return Promise.reject();
         }
     }
@@ -180,18 +175,26 @@ export default class Parser extends Service {
         this.errorsMap = {};
         this.initHooks();
     }
-    public async logErrors(isClear: boolean) {
+    public async logErrors(isClear: boolean = false) {
         if (isClear) {
             utils.outputChannel.clear();
         }
+        this.errorCount = 0;
         this.errors?.forEach((error) => {
             error.logError();
+            if (!error.isRight) {
+                this.errorCount++;
+            }
         });
         await utils.outputChannel.show();
     }
     public async putColors() {
+        this.errorCount = 0;
         this.errors?.forEach((error) => {
             error.putColor();
+            if (!error.isRight) {
+                this.errorCount++;
+            }
         });
         Object.keys(this.decorations).forEach((decorationType: string) => {
             const decoration = vscode.window.createTextEditorDecorationType(
@@ -211,8 +214,7 @@ export default class Parser extends Service {
             }, (err: any) => {
                 if (err) {
                     this.isComplete = true;
-                    vscode.window.showWarningMessage(`${this.filepath} - Babel解析失败` + err.stack);
-                    rejects();
+                    rejects(err);
                 } else {
                     resolve(err);
                 }

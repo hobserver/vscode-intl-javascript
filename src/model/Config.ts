@@ -60,6 +60,16 @@ export default class {
         const configFile = findConfigFile(path.dirname(this.filepath));
         return configFile;
     }
+    async getTempDir(configFile: string | null): Promise<string> {
+        if (!configFile) {
+            configFile = this.findConfigFile();
+        }
+        if (configFile) {
+            return path.join(path.dirname(configFile), '.locale');
+        } else {
+            return Promise.reject();
+        }
+    }
     async handleConfigFile(configFile: string) {
         const initConfig = noCacheRequire(configFile);
         const config = initConfig(this);
@@ -75,7 +85,7 @@ export default class {
         if (config.fileExt) {
             this.fileExt = config.fileExt;
         }
-        const tempLocal = path.join(path.dirname(configFile), 'locale');
+        const tempLocal = await this.getTempDir(configFile);
         if (!fs.existsSync(tempLocal)) {
             fs.mkdirSync(tempLocal);
         }
@@ -92,5 +102,4 @@ export default class {
             this.parser.plugins = this.parser.plugins.concat(config.plugins);
         }
     }
-    
 }

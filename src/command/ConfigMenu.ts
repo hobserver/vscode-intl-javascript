@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import {Commands} from '../constants/command';
-import { CommonCommandParam, HoverMenuCommandParam } from '../interface';
 import ParserManager from '../model/ParserManager';
-export default function(ctx: vscode.ExtensionContext) {
+const setConfigMenuCommand = (ctx: vscode.ExtensionContext) => {
     ctx.subscriptions.push(vscode.commands.registerCommand(Commands.ConfigMenu, (commandParams: any) => {
         // 获取当前的
         const {path} = commandParams;
@@ -15,3 +14,4 @@ export default function(ctx: vscode.ExtensionContext) {
         });
     }));
 }
+export default setConfigMenuCommand;

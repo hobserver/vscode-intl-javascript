@@ -1,5 +1,5 @@
 
-import { MessageInfoResParams } from '../../interface';
+import { LangKey, MessageInfoResParams } from '../../interface';
 import BaseErrorNode from '../../model/BaseErrorNode';
 import Config from '../../model/Config';
 import IntlStorage from '../../model/IntlStorage';
@@ -11,9 +11,15 @@ const t = require("@babel/types");
 import HardCodeErrorNode from './Nodes/HardCode';
 export = class {
     options: {
-        defaultLangReg: RegExp
+        defaultLang: LangKey
         defaultFuncNameReg: RegExp
         getFuncNameReg: RegExp
+    }
+    // @ts-ignore
+    private langRegexp: {
+        [langKey in LangKey]: RegExp
+    } = {
+        zh_CN: /[\u4e00-\u9fa5]/
     }
     config?: Config;
     parser?: Parser
@@ -78,7 +84,7 @@ export = class {
     checkNode(nodePath: any) {
         let nodeValue = this.getNodeValue(nodePath.node);
         if (
-            this.options.defaultLangReg.test(nodeValue)
+            this.langRegexp[this.options.defaultLang].test(nodeValue)
         ) {
             const filePath = nodePath.hub.file.opts.filename;
             const intlNode = nodePath.findParent((item: any) => {
@@ -162,7 +168,7 @@ export = class {
                         nodeValue = replaceTextArr.join('');
                     }
                 }
-                if (node) { 
+                if (node && node.loc) { 
                     const locNode = node.loc;
                     if (
                         node.start
