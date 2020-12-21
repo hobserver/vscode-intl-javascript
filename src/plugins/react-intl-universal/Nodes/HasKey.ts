@@ -88,7 +88,7 @@ export default class HasKeyErrorNode extends BaseNode {
             this.check();
         }
         if (this.logs.length > 0) {
-            this.appendLog(this.logs.join(',') + '：' + this.getErrorLine());
+            super.logError(this.logs.join(','));
         }
     }
     showMenu({

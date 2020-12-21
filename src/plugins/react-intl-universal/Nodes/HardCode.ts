@@ -2,6 +2,8 @@
 import BaseNode from '../../../model/BaseErrorNode';
 import {ErrorNodeParam, HoverMenuCommandParam, HoverParams, Lang, MessageInfoResParams, StorageAddParams} from '../../../interface';
 import * as vscode from 'vscode';
+import * as path from 'path';
+var CRC32 = require('crc-32'); 
 import command from '../command';
 export default class NoKeyErrorNode extends BaseNode {
     type = 'HardCode';
@@ -29,7 +31,9 @@ export default class NoKeyErrorNode extends BaseNode {
                             value: key === 0 ? this.extraParams.text : ''
                         }
                     }),
-                    key: ''
+                    key: path.relative(parser.config.projectDir,
+                        path.dirname(this.filepath) + '/' + path.basename(this.filepath).substr(0, path.basename(this.filepath).lastIndexOf('.'))
+                        ).split('/').join('_') + CRC32.str(this.extraParams.text)
                 });
             }
         });
@@ -97,6 +101,6 @@ export default class NoKeyErrorNode extends BaseNode {
         return;
     }
     logError() {
-        this.appendLog(`硬编码文件 ${this.filepath}:${this.startRow}:${this.startCol}`);
+        super.logError('硬编码文件');
     }
 }

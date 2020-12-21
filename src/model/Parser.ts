@@ -6,7 +6,7 @@ import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import utils from '../utils/index';
 import Service from './Service';
-import { MessageInfoSendParams, WebviewListenerParams } from '../interface';
+import { MessageInfoSendParams, WebviewBtn, WebviewListenerParams } from '../interface';
 import WebViewPlugin from '../plugins/webview/index';
 import HoverCommandPlugin from '../plugins/hover-menu-command/index';
 import ConfigCommandPlugin from '../plugins/config-menu-command/index';
@@ -30,6 +30,7 @@ export default class Parser extends Service {
     public decorations: {
         [color: string]: (vscode.Range | vscode.DecorationOptions)[]
     } = {};
+    public diagnostics: vscode.Diagnostic[] = []
     public errorsMap: {
         [key: string]: BaseErrorNode
     } = {};
@@ -53,7 +54,7 @@ export default class Parser extends Service {
         metaHook: AsyncSeriesWaterfallHook<[string[]]>,
         cssHook: AsyncSeriesWaterfallHook<[string[]]>,
         bodyHtmlHook: AsyncSeriesWaterfallHook<[string[]]>,
-        btnHook: AsyncSeriesWaterfallHook<[string[]]>,
+        btnHook: AsyncSeriesWaterfallHook<[WebviewBtn[]]>,
         bodyFooterJsHook: AsyncSeriesWaterfallHook<[string[]]>,
         bodyHeaderJsHook: AsyncSeriesWaterfallHook<[string[]]>,
         listenerHook: AsyncSeriesWaterfallHook<[WebviewListenerParams[]]>,
@@ -73,7 +74,7 @@ export default class Parser extends Service {
     constructor (filepath: string) {
         super();
         this.parserManager = ParserManager.getSingleInstance();
-        this.webview = SidebarWebview.getSingleInstance();
+        this.webview = SidebarWebview.getSingleInstance(this);
         this.filepath = filepath;
         this.config = new Config(this, filepath);
         this.intlStorage = new IntlStorage(this.config);
@@ -122,6 +123,20 @@ export default class Parser extends Service {
         this.updateHook = new AsyncSeriesWaterfallHook(['updateQueues']);
         this.processListenerHook = new HookMap((type: string) => new AsyncParallelHook(["params"]));
     }
+    public addDiagnostic(message: string, range: {
+        startCol: number,
+        startRow: number,
+        endCol: number,
+        endRow: number,
+    }) {
+        this.diagnostics.push(
+            new vscode.Diagnostic(
+                new vscode.Range(new vscode.Position(range.startRow - 1, range.startCol),
+                    new vscode.Position(range.endRow - 1, range.endCol)),
+                    message,
+                    vscode.DiagnosticSeverity.Warning)
+        );
+    }
     public addDecoration(color: string, range: vscode.Range | vscode.DecorationOptions) {
         if (!this.decorations[color]) {
             this.decorations[color] = [];
@@ -150,7 +165,6 @@ export default class Parser extends Service {
             await this.config.init();
             await this.intlStorage.initLang();
             await this.handlePlugins();
-            this.webview.setParser(this);
             await this.babelParser();
             this.isComplete = true;
             return this;
@@ -162,6 +176,7 @@ export default class Parser extends Service {
     }
     private resetDataForConfig() {
         this.errors = [];
+        this.diagnostics = [];
         this.plugins = [
             new ConfigCommandPlugin(),
             new HoverCommandPlugin(),
@@ -177,7 +192,7 @@ export default class Parser extends Service {
     }
     public async logErrors(isClear: boolean = false) {
         if (isClear) {
-            utils.outputChannel.clear();
+            await utils.diagnostic.clear();
         }
         this.errorCount = 0;
         this.errors?.forEach((error) => {
@@ -186,7 +201,8 @@ export default class Parser extends Service {
                 this.errorCount++;
             }
         });
-        await utils.outputChannel.show();
+        const uri = vscode.Uri.file(this.filepath);
+        await utils.diagnostic.set(uri, this.diagnostics);
     }
     public async putColors() {
         this.errorCount = 0;

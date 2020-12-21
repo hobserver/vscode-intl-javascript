@@ -3,14 +3,14 @@ import BaseErrorNode from "./BaseErrorNode";
 import Parser from "./Parser";
 declare class SidebarWebview {
     static instance: SidebarWebview;
-    static getSingleInstance(): SidebarWebview;
+    static getSingleInstance(parser: Parser): SidebarWebview;
     callbackCaches: {
         [callbackName: string]: (...args: any[]) => any;
     };
     webviewReady: boolean;
     panel?: WebviewPanel;
-    parser?: Parser;
-    setParser(parser: Parser): void;
+    parser: Parser;
+    constructor(parser: Parser);
     open(): Promise<undefined>;
     triggerWebviewListener(method: string, params: any, callback?: any): void;
     sendErrorNode(errorNode: BaseErrorNode): void;

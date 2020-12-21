@@ -3,19 +3,20 @@ import BaseErrorNode from './BaseErrorNode';
 import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import Service from './Service';
-import { MessageInfoSendParams, WebviewListenerParams } from '../interface';
+import { MessageInfoSendParams, WebviewBtn, WebviewListenerParams } from '../interface';
 import SidebarWebview from './WebView';
 import ParserManager from './ParserManager';
 import { SyncWaterfallHook, HookMap, AsyncParallelHook, AsyncSeriesWaterfallHook } from 'tapable';
 export default class Parser extends Service {
+    vscode: any;
     errorCount: number;
     parserManager: ParserManager;
     private _prevDecorations;
     utils: {
         readonly extensionId: string;
         readonly extension: vscode.Extension<any>;
+        diagnostic: vscode.DiagnosticCollection;
         activeTextEditor: typeof vscode.TextEdit;
-        outputChannel: vscode.OutputChannel;
         setActiveTextEditor(activeTextEditor: any): void;
         getActiveEditor(): any;
         getCurrentFilePath(): any;
@@ -25,6 +26,7 @@ export default class Parser extends Service {
     decorations: {
         [color: string]: (vscode.Range | vscode.DecorationOptions)[];
     };
+    diagnostics: vscode.Diagnostic[];
     errorsMap: {
         [key: string]: BaseErrorNode;
     };
@@ -44,7 +46,7 @@ export default class Parser extends Service {
         metaHook: AsyncSeriesWaterfallHook<[string[]]>;
         cssHook: AsyncSeriesWaterfallHook<[string[]]>;
         bodyHtmlHook: AsyncSeriesWaterfallHook<[string[]]>;
-        btnHook: AsyncSeriesWaterfallHook<[string[]]>;
+        btnHook: AsyncSeriesWaterfallHook<[WebviewBtn[]]>;
         bodyFooterJsHook: AsyncSeriesWaterfallHook<[string[]]>;
         bodyHeaderJsHook: AsyncSeriesWaterfallHook<[string[]]>;
         listenerHook: AsyncSeriesWaterfallHook<[WebviewListenerParams[]]>;
@@ -61,6 +63,12 @@ export default class Parser extends Service {
     constructor(filepath: string);
     handlePlugins(): Promise<void>;
     initHooks(): void;
+    addDiagnostic(message: string, range: {
+        startCol: number;
+        startRow: number;
+        endCol: number;
+        endRow: number;
+    }): void;
     addDecoration(color: string, range: vscode.Range | vscode.DecorationOptions): void;
     pushError(errorNode: BaseErrorNode): void;
     parse(): Promise<this>;

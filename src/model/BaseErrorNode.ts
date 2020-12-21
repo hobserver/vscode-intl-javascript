@@ -72,9 +72,6 @@ export default class {
         markdown.isTrusted = true;
         return new vscode.Hover(markdown)
     }
-    appendLog(log: string) {
-        this.parser.utils.outputChannel.appendLine(log);
-    }
     async replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
         var addParams: StorageAddParams[] = [];
         errorInfo.langs.forEach(item => {
@@ -101,11 +98,13 @@ export default class {
             });
         }
     }
-    logError() {
-        this.appendLog(this.getErrorLine());
-    }
-    getErrorLine() {
-        return `${this.filepath}:${this.startRow}:${this.startCol}`;
+    logError(text?: string) {
+        this.parser.addDiagnostic(text || '出现错误', {
+            startCol: this.startCol,
+            startRow: this.startRow,
+            endCol: this.endCol,
+            endRow: this.endRow
+        });
     }
     showMenu(params: HoverParams): vscode.ProviderResult<vscode.Hover> {
         return;

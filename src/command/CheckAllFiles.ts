@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import {Commands} from '../constants/command';
 import ParserManager from '../model/ParserManager';
 import utils from '../utils/index';
+import * as fs from 'fs';
 const setCheckAllFilesCommand = (ctx: vscode.ExtensionContext) => {
     ctx.subscriptions.push(vscode.commands.registerCommand(Commands.CheckAllFiles, (commandParams: any) => {
         // 获取当前的
@@ -12,7 +13,13 @@ const setCheckAllFilesCommand = (ctx: vscode.ExtensionContext) => {
             value: currentDir,
             valueSelection: [currentDir.lastIndexOf('/'), currentDir.length]
         }).then((dir: any) => {
-            parserManager.parseDir(dir);
+            if (fs.statSync(dir).isDirectory()) {
+                parserManager.parseDir(dir);
+            } else {
+                parserManager.parseFile(dir).then((parser) => {
+                    parser.logErrors();
+                });
+            }
         });
     }));
 }

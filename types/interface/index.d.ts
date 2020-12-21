@@ -16,9 +16,23 @@ export interface StorageAddParams {
     text: string;
     lang: LangKey;
 }
+export interface WebviewBtn {
+    key: string;
+    text: string;
+    functionConstructorParams: string[];
+}
 export interface WebviewListenerParams {
     name: string;
     functionConstructorParams: string[];
+}
+export interface MessageInfoSendParams {
+    filePath: string;
+    id: string;
+    key: string;
+    langs: {
+        langKey: LangKey;
+        value: string | null | undefined;
+    }[];
 }
 export interface MessageInfoSendParams {
     filePath: string;

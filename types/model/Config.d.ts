@@ -6,6 +6,7 @@ export default class {
     fileReg: RegExp;
     isCurrentFileLogError: boolean;
     localeDir: string | null;
+    projectDir: string;
     parser: Parser;
     filepath: string;
     langMap: {

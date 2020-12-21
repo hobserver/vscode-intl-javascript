@@ -14,6 +14,7 @@ export default class {
     public localeDir: string | null = null;
 
     // 上面的属性是需要传进来的配置
+    public projectDir: string = '';
     public parser: Parser
     public filepath: string;
     // @ts-ignore
@@ -54,6 +55,7 @@ export default class {
                     path.dirname(fileDir)
                 );
             } else {
+                this.projectDir = fileDir;
                 return `${fileDir}/${localConfigFileName}`;
             }
         }

@@ -14,6 +14,11 @@ export default class WebViewPlugin {
         parser.webview.addParentListener('errorNodeReplace', (params) => {
         });
     }
+    getStaticFileSrc(parser: Parser, filepath: string): vscode.Uri {
+        const onDiskPath = vscode.Uri.file(filepath);
+        // @ts-ignore
+        return parser?.webview.panel?.webview.asWebviewUri(onDiskPath);
+    }
     async apply(parser: Parser) {
         this.initWebviewApi(parser);
         const {webViewHooks, webview} = parser;
@@ -27,9 +32,9 @@ export default class WebViewPlugin {
         initApiJs(parser);
         webViewHooks.jsHook.tapPromise('jss', async (jsArr: string[]) => {
             return jsArr.concat([
-                `<script src="https://unpkg.com/uuid@latest/dist/umd/uuidv4.min.js"></script>`,
-                `<script src="https://g.alicdn.com/dwfe/common/0.0.4/vue/index.js"></script>`,
-                `<script src="https://g.alicdn.com/dwfe/common/0.0.4/vue/element.js"></script>`,
+                `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/uuidv4.js'))}"></script>`,
+                `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/vue.js'))}"></script>`,
+                `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/element.js'))}"></script>`,
                 `<style type="type/css">
                     .input {
                         width: 100%;
@@ -39,7 +44,7 @@ export default class WebViewPlugin {
         });
         webViewHooks.cssHook.tapPromise('css', async (cssArr: string[]) => {
             return cssArr.concat([
-                `<link rel="stylesheet" href="https://g.alicdn.com/dwfe/common/0.0.4/vue/index.css">`
+                `<link rel="stylesheet" href="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/css/vue.css'))}">`
             ]);
         });
         webViewHooks.metaHook.tapPromise('meta', async (metaArr: string[]) => {

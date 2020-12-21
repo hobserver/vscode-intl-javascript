@@ -22,7 +22,6 @@ export default function initBodyCreateJs({webViewHooks, webview}: Parser) {
                 window.addEventListener('message', (data) => {
                     const { listenerName, id, type, params } = data.data;
                     if (type === 'intl-js-vscode.triggerWebviewListener') {
-                        debugger
                         if (window.webviewListener[listenerName]) {
                             window.webviewListener[listenerName].call(app, params, (callbackParams) => {
                                 vscode.postMessage({

@@ -20,10 +20,8 @@ export default class {
     _replace(start: number, end: number, text: string): void;
     getCommandUrl(commandKey: any, params: any): string;
     createHoverCommandMenu(menus: HoverCommandMenuItem[]): vscode.Hover;
-    appendLog(log: string): void;
     replaceAndSave(errorInfo: MessageInfoResParams, text?: string): Promise<void>;
     putColor(): void;
-    logError(): void;
-    getErrorLine(): string;
+    logError(text?: string): void;
     showMenu(params: HoverParams): vscode.ProviderResult<vscode.Hover>;
 }
