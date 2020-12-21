@@ -14,8 +14,8 @@ export default class Parser extends Service {
     utils: {
         readonly extensionId: string;
         readonly extension: vscode.Extension<any>;
+        diagnostic: vscode.DiagnosticCollection;
         activeTextEditor: typeof vscode.TextEdit;
-        outputChannel: vscode.OutputChannel;
         setActiveTextEditor(activeTextEditor: any): void;
         getActiveEditor(): any;
         getCurrentFilePath(): any;
@@ -25,6 +25,7 @@ export default class Parser extends Service {
     decorations: {
         [color: string]: (vscode.Range | vscode.DecorationOptions)[];
     };
+    diagnostics: vscode.Diagnostic[];
     errorsMap: {
         [key: string]: BaseErrorNode;
     };
@@ -61,6 +62,12 @@ export default class Parser extends Service {
     constructor(filepath: string);
     handlePlugins(): Promise<void>;
     initHooks(): void;
+    addDiagnostic(message: string, range: {
+        startCol: number;
+        startRow: number;
+        endCol: number;
+        endRow: number;
+    }): void;
     addDecoration(color: string, range: vscode.Range | vscode.DecorationOptions): void;
     pushError(errorNode: BaseErrorNode): void;
     parse(): Promise<this>;

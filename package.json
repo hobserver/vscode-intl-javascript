@@ -3,7 +3,7 @@
   "publisher": "rongpingli",
   "displayName": "vscode-intl-javascript",
   "description": "vscode intl plugin",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "engines": {
     "vscode": "^1.50.0"
   },
@@ -13,7 +13,10 @@
   "activationEvents": [
     "onLanguage:javascript",
     "onLanguage:typescript",
-    "onLanguage:typescriptreact"
+    "onLanguage:typescriptreact",
+    "onLanguage:javascriptreact",
+    "onLanguage:vue",
+    "onLanguage:vue-html"
   ],
   "main": "./out/extension.js",
   "types": "./types/interface/index.d.ts",
@@ -21,7 +24,7 @@
     "commands": [
       {
         "command": "vscode-intl-javascript.check_all_dir_files",
-        "title": "intl:检查文件夹下所有文件"
+        "title": "intl-check all file in dir"
       },
       {
         "command": "vscode-intl-javascript.show_config_command_list",
@@ -90,9 +93,11 @@
     "@babel/preset-typescript": "7.8.3",
     "@babel/types": "^7.10.4",
     "art-template": "^4.13.2",
+    "crc-32": "^1.2.0",
     "md5": "^2.3.0",
     "node-readfiles": "^0.2.0",
     "node-uuid": "^1.4.8",
+    "recursive-readdir": "^2.2.2",
     "tapable": "^2.1.1"
   }
 }

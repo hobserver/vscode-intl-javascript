@@ -57,6 +57,13 @@ export = class {
             });
             errorNode?.replaceAndSave(errorInfo);
         });
+        this.parser.webview.addParentListener('onErrorInfoReplaceWithKuohao', (errorInfo: MessageInfoResParams) => {
+            // 找到对应的ErrorNode 节点，然后调用replace方法
+            const errorNode: any = this.parser?.parserManager.caches[errorInfo.filePath]?.errors.find((item: BaseErrorNode) => {
+                return item.id === errorInfo.id;
+            });
+            errorNode?.replaceAndSaveWithBrackets(errorInfo);
+        });
         webViewHooks.btnHook.tapPromise('replace', async (btns: any[]) => {
             return btns.concat([
                 {
@@ -66,6 +73,16 @@ export = class {
                         'errorInfo',
                         `
                             triggerParentListener('onErrorInfoReplace', errorInfo);
+                        `
+                    ]
+                },
+                {
+                    key: 'replaceWithBrackets',
+                    text: '替换并加大括号',
+                    functionConstructorParams: [
+                        'errorInfo',
+                        `
+                            triggerParentListener('onErrorInfoReplaceWithKuohao', errorInfo);
                         `
                     ]
                 }

@@ -3,6 +3,8 @@ import Parser from './Parser';
 import utils from '../utils/index';
 import * as vscode from 'vscode';
 var readfiles = require('node-readfiles');
+
+var CRC32 = require('crc-32'); 
 import * as path from 'path';
 class ParserManger {
     static instance: ParserManger
@@ -19,11 +21,15 @@ class ParserManger {
     }
     async handleTimerQueue() {
         const filePath = utils.getCurrentFilePath();
-        const parser = this.caches[filePath];
-        if (new Date().getTime() - this.lastUpdateTime > 60 * 1000) {
-            const updateQueues = await parser.updateHook.promise([]);
-            for (var i = 0, len = updateQueues.length; i < len; i++) {
-                updateQueues[i]();
+        if (filePath) {
+            const parser = this.caches[filePath];
+            if (parser) {
+                if (new Date().getTime() - this.lastUpdateTime > 1 * 1000) {
+                    const updateQueues = await parser.updateHook.promise([]);
+                    for (var i = 0, len = updateQueues.length; i < len; i++) {
+                        updateQueues[i]();
+                    }
+                }
             }
         }
     }
@@ -35,16 +41,15 @@ class ParserManger {
             return Promise.reject();
         }
     }
-    parseDir(dirName: string) {
-        utils.outputChannel.clear();
+    async parseDir(dirName: string) {
         // 获取所有文件，然后出个排查
-        var errorCount = 0;
+        await utils.diagnostic.clear();
         return readfiles(dirName, {
             filter: [
-                '*.ts',
-                '*.tsx',
-                '*.js',
-                '*.jsx',
+                '.ts$',
+                '.tsx$',
+                '.js$',
+                '.jsx$',
             ]
         }, (err: any, filename: any) => {
             if (err) throw err;
@@ -54,10 +59,6 @@ class ParserManger {
                 const filename = path.join(dirName, files[index]);
                 this.parseFile(filename).then((parser) => {
                     index++;
-                    errorCount = errorCount + parser.errorCount;
-                    if (errorCount > 200) {
-                        return;
-                    }
                     parser.logErrors();
                     if (index < files.length) {
                         run();

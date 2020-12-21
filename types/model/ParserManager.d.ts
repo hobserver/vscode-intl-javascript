@@ -10,7 +10,7 @@ declare class ParserManger {
     static getSingleInstance(): ParserManger;
     handleTimerQueue(): Promise<void>;
     parseCurrentFile(): Promise<Parser>;
-    parseDir(dirName: string): any;
+    parseDir(dirName: string): Promise<any>;
     parseFile(filepath: string): Promise<Parser>;
     showHoverMenu(params: HoverParams): vscode.ProviderResult<vscode.Hover>;
 }

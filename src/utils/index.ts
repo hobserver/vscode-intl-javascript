@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import {extensions} from 'vscode';
 const path = require('path');
 import config from '../config/index';
+const id = `${config.publisher}.${config.name}`;
 export default {
     get extensionId(): string {
         return `${config.publisher}.${config.name}`;
@@ -10,8 +11,8 @@ export default {
         // @ts-ignore
         return extensions.getExtension(this.extensionId);
     },
+    diagnostic: vscode.languages.createDiagnosticCollection(id),
     activeTextEditor: vscode.TextEdit,
-    outputChannel: vscode.window.createOutputChannel('this.config.name'),
     setActiveTextEditor(activeTextEditor: any) {
         if (activeTextEditor?.document?.fileName) {
             this.activeTextEditor = activeTextEditor;
