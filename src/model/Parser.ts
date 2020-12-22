@@ -15,7 +15,6 @@ import ParserManager from './ParserManager';
 import noCacheRequire from '../utils/no-cache-require';
 import {
     SyncWaterfallHook,
-    SyncHook,
     HookMap,
     AsyncParallelHook,
     AsyncSeriesWaterfallHook
