@@ -6,7 +6,10 @@ import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <div>
+      <App />
+      <div>硬编码5</div>
+    </div>
   </React.StrictMode>,
   document.getElementById('root')
 );

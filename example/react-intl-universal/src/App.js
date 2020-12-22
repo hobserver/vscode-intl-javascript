@@ -3,6 +3,8 @@ import './App.css';
 import intl from 'react-intl-universal';
 function App() {
   console.log(intl.get('src_App1510599991').d('中文'));
+  console.log('硬编码1');
+  console.log('硬编码2');
   return (
     <div className="App">
       <header className="App-header">
@@ -17,6 +19,7 @@ function App() {
           rel="noopener noreferrer"
         >
           Learn React
+          <div>硬编码三</div>
         </a>
       </header>
     </div>

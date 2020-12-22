@@ -1,5 +1,5 @@
 
-import { LangKey, MessageInfoResParams } from '../../interface';
+import { LangKey, MessageInfoResParams, WebviewBtn } from '../../interface';
 import BaseErrorNode from '../../model/BaseErrorNode';
 import Config from '../../model/Config';
 import IntlStorage from '../../model/IntlStorage';
@@ -64,7 +64,7 @@ export = class {
             });
             errorNode?.replaceAndSaveWithBrackets(errorInfo);
         });
-        webViewHooks.btnHook.tapPromise('replace', async (btns: any[]) => {
+        webViewHooks.btnHook.tapPromise('replace', async (btns: WebviewBtn[]) => {
             return btns.concat([
                 {
                     key: 'replace',

@@ -3,10 +3,11 @@
   "publisher": "rongpingli",
   "displayName": "vscode-intl-javascript",
   "description": "vscode intl plugin",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.50.0"
   },
+  "repository": "https://github.com/hobserver/vscode-intl-javascript",
   "categories": [
     "Other"
   ],
@@ -20,6 +21,7 @@
   ],
   "main": "./out/extension.js",
   "types": "./types/interface/index.d.ts",
+  "license": "BSD-3-Clause",
   "contributes": {
     "commands": [
       {
@@ -92,6 +94,7 @@
     "@babel/preset-react": "7.8.3",
     "@babel/preset-typescript": "7.8.3",
     "@babel/types": "^7.10.4",
+    "@types/vscode": "^1.51.0",
     "art-template": "^4.13.2",
     "crc-32": "^1.2.0",
     "md5": "^2.3.0",

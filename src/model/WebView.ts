@@ -7,11 +7,11 @@ import Parser from "./Parser";
 import { WebviewListenerParams } from "../interface";
 class SidebarWebview {
     static instance: SidebarWebview;
-    static getSingleInstance () {
+    static getSingleInstance (parser: Parser) {
         if (SidebarWebview.instance) {
             return SidebarWebview.instance;
         }
-        SidebarWebview.instance = new SidebarWebview();
+        SidebarWebview.instance = new SidebarWebview(parser);
         return SidebarWebview.instance;
     }
     callbackCaches: {
@@ -19,12 +19,9 @@ class SidebarWebview {
     } = {}
     webviewReady = false;
     panel?: WebviewPanel;
-    parser?: Parser
-    setParser(parser: Parser) {
+    parser: Parser
+    constructor(parser: Parser) {
         this.parser = parser;
-        this.addParentListener('showInformationMessage', (info) => {
-            vscode.window.showWarningMessage(info);
-        });
     }
     async open() {
         if (this.panel) return;
@@ -51,7 +48,7 @@ class SidebarWebview {
                         if (!this.webviewReady) {
                             _run();
                         } else {
-                            resolve();
+                            resolve(null);
                         }
                     }, 60);
                 }
@@ -94,7 +91,7 @@ class SidebarWebview {
         });
     }
     addParentListener(name: string, func: (...args: any[]) => any) {
-        this.parser?.processListenerHook.for(name).tapPromise(name, async (...args: any) => {
+        this.parser.processListenerHook.for(name).tapPromise(name, async (...args: any) => {
             func(...args);
         });
     }
@@ -104,7 +101,7 @@ class SidebarWebview {
     onMessage(data: any) {
         const { listenerName, id, type, params } = data;
         if (type === 'intl-js-vscode.triggerParentListener') {
-            this.parser?.processListenerHook.get(listenerName)?.promise(params).then(async () => {
+            this.parser.processListenerHook.get(listenerName)?.promise(params).then(async () => {
                 this.sendMessage({
                     id,
                     type: 'intl-js-vscode.webview_callback',

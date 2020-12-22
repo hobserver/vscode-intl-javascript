@@ -6,7 +6,7 @@ import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import utils from '../utils/index';
 import Service from './Service';
-import { MessageInfoSendParams, WebviewListenerParams } from '../interface';
+import { MessageInfoSendParams, WebviewBtn, WebviewListenerParams } from '../interface';
 import WebViewPlugin from '../plugins/webview/index';
 import HoverCommandPlugin from '../plugins/hover-menu-command/index';
 import ConfigCommandPlugin from '../plugins/config-menu-command/index';
@@ -15,7 +15,6 @@ import ParserManager from './ParserManager';
 import noCacheRequire from '../utils/no-cache-require';
 import {
     SyncWaterfallHook,
-    SyncHook,
     HookMap,
     AsyncParallelHook,
     AsyncSeriesWaterfallHook
@@ -54,7 +53,7 @@ export default class Parser extends Service {
         metaHook: AsyncSeriesWaterfallHook<[string[]]>,
         cssHook: AsyncSeriesWaterfallHook<[string[]]>,
         bodyHtmlHook: AsyncSeriesWaterfallHook<[string[]]>,
-        btnHook: AsyncSeriesWaterfallHook<[string[]]>,
+        btnHook: AsyncSeriesWaterfallHook<[WebviewBtn[]]>,
         bodyFooterJsHook: AsyncSeriesWaterfallHook<[string[]]>,
         bodyHeaderJsHook: AsyncSeriesWaterfallHook<[string[]]>,
         listenerHook: AsyncSeriesWaterfallHook<[WebviewListenerParams[]]>,
@@ -74,7 +73,7 @@ export default class Parser extends Service {
     constructor (filepath: string) {
         super();
         this.parserManager = ParserManager.getSingleInstance();
-        this.webview = SidebarWebview.getSingleInstance();
+        this.webview = SidebarWebview.getSingleInstance(this);
         this.filepath = filepath;
         this.config = new Config(this, filepath);
         this.intlStorage = new IntlStorage(this.config);
@@ -165,7 +164,6 @@ export default class Parser extends Service {
             await this.config.init();
             await this.intlStorage.initLang();
             await this.handlePlugins();
-            this.webview.setParser(this);
             await this.babelParser();
             this.isComplete = true;
             return this;

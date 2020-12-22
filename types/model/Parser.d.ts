@@ -3,11 +3,12 @@ import BaseErrorNode from './BaseErrorNode';
 import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import Service from './Service';
-import { MessageInfoSendParams, WebviewListenerParams } from '../interface';
+import { MessageInfoSendParams, WebviewBtn, WebviewListenerParams } from '../interface';
 import SidebarWebview from './WebView';
 import ParserManager from './ParserManager';
 import { SyncWaterfallHook, HookMap, AsyncParallelHook, AsyncSeriesWaterfallHook } from 'tapable';
 export default class Parser extends Service {
+    vscode: any;
     errorCount: number;
     parserManager: ParserManager;
     private _prevDecorations;
@@ -45,7 +46,7 @@ export default class Parser extends Service {
         metaHook: AsyncSeriesWaterfallHook<[string[]]>;
         cssHook: AsyncSeriesWaterfallHook<[string[]]>;
         bodyHtmlHook: AsyncSeriesWaterfallHook<[string[]]>;
-        btnHook: AsyncSeriesWaterfallHook<[string[]]>;
+        btnHook: AsyncSeriesWaterfallHook<[WebviewBtn[]]>;
         bodyFooterJsHook: AsyncSeriesWaterfallHook<[string[]]>;
         bodyHeaderJsHook: AsyncSeriesWaterfallHook<[string[]]>;
         listenerHook: AsyncSeriesWaterfallHook<[WebviewListenerParams[]]>;

@@ -1,7 +1,7 @@
 # How to use it
 Search vscode-intl-javascript in vscode Market, then install it
 
-# simple start (react)
+# Simple start (react)
 ## create config file in project dir
 intl.config.js
 ## install package 
@@ -35,7 +35,7 @@ module.exports = (parser) => {
     }
 }
 ```
-# usage display
+# Usage display
 ## basic usage
 ![basic usage](https://img.alicdn.com/imgextra/i4/O1CN018tbMyv1bN3rgb47hv_!!6000000003452-1-tps-1193-667.gif)
 ## replace already key
@@ -44,6 +44,8 @@ module.exports = (parser) => {
 ![replace no right key](https://img.alicdn.com/imgextra/i1/O1CN01BIef8z1HGqAaFO251_!!6000000000731-1-tps-1193-667.gif)
 ## replace no right value
 ![replace no right value](https://img.alicdn.com/imgextra/i4/O1CN014F38Fb255bEsEujus_!!6000000007475-1-tps-1193-667.gif)
+## batch check dir
+![batch check dir](https://img.alicdn.com/imgextra/i1/O1CN01TVn2nk1z8S0eceaXr_!!6000000006669-1-tps-1343-915.gif)
 
 
 # Config
@@ -87,14 +89,17 @@ export default class ReactIntlUniversal {
     optionA: 'XXX',
 }]
 ```
-# how to write a plugin
+# How to write a plugin
+clone plugin template from github [vscode-intl-javascript-plugin-template](https://github.com/hobserver/vscode-intl-javascript-plugin-template)
 ```
+// just reference the code in src/plugins
 export default class {
     apply(parser) {
         //...
     }
 }
 ```
+
 # Parser API
 ## filepath
 current parse file path
@@ -160,7 +165,7 @@ registerService(serviceName: keyof ParserService, serviceObj: any): void;
 getService<T extends keyof ParserService>(serviceName: T): ParserService[T];
 ```
 
-# plugin list
+# Plugin list
 ## inner plugin
 ### react babel parser plugin
 ```
@@ -191,3 +196,5 @@ plugins: [
 ## external plugin
 ### alibaba interior
 - (@ali/vscode-intl-javascript-plugin-mds)[https://npm.alibaba-inc.com/package/@ali/vscode-intl-javascript-plugin-mds]
+# communication
+group dingding(钉钉群): 32965438
