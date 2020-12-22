@@ -3,7 +3,11 @@
   "publisher": "rongpingli",
   "displayName": "vscode-intl-javascript",
   "description": "vscode intl plugin",
+<<<<<<< HEAD
   "version": "0.0.5",
+=======
+  "version": "0.0.4",
+>>>>>>> 1b9e576a75f23f188053940f4fa29ef5d142789b
   "engines": {
     "vscode": "^1.50.0"
   },
