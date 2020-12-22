@@ -90,6 +90,7 @@ export default class ReactIntlUniversal {
 }]
 ```
 # How to write a plugin
+clone plugin template from github [vscode-intl-javascript-plugin-template](https://github.com/hobserver/vscode-intl-javascript-plugin-template)
 ```
 // just reference the code in src/plugins
 export default class {
