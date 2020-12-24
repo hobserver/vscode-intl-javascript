@@ -1,7 +1,6 @@
 import Parser from "./Parser";
 import { Lang, LangKey } from '../interface';
 export default class {
-    projectDir: string;
     langs: Lang[];
     fileExt: string;
     fileReg: RegExp;

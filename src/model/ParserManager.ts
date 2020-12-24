@@ -77,10 +77,13 @@ class ParserManger {
     showHoverMenu(params: HoverParams): vscode.ProviderResult<vscode.Hover> {
         const fileName = params.document.fileName;
         var errorHoverMenus;
-        for (var i = 0; i < this.caches[fileName].errors.length; i++) {
-            const tempErrorHoverMenus = this.caches[fileName].errors[i].showMenu(params);
-            if (tempErrorHoverMenus) {
-                errorHoverMenus = tempErrorHoverMenus;
+        const parser = this.caches[fileName];
+        if (parser) {
+            for (var i = 0; i < this.caches[fileName].errors.length; i++) {
+                const tempErrorHoverMenus = this.caches[fileName].errors[i].showMenu(params);
+                if (tempErrorHoverMenus) {
+                    errorHoverMenus = tempErrorHoverMenus;
+                }
             }
         }
         return errorHoverMenus;

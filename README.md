@@ -35,6 +35,10 @@ module.exports = (parser) => {
     }
 }
 ```
+# Example
+[example](https://github.com/hobserver/vscode-intl-javascript-example)
+
+
 # Usage display
 ## basic usage
 ![basic usage](https://img.alicdn.com/imgextra/i4/O1CN018tbMyv1bN3rgb47hv_!!6000000003452-1-tps-1193-667.gif)
@@ -166,7 +170,7 @@ getService<T extends keyof ParserService>(serviceName: T): ParserService[T];
 ```
 
 # Plugin list
-## inner plugin
+## built-in plugins
 ### react babel parser plugin
 ```
 const ReactBabel = require('vscode-intl-javascript/out/plugins/react');
@@ -193,8 +197,13 @@ plugins: [
     new ReactBabel(),
 ]
 ```
-## external plugin
-### alibaba interior
-- (@ali/vscode-intl-javascript-plugin-mds)[https://npm.alibaba-inc.com/package/@ali/vscode-intl-javascript-plugin-mds]
+## other plugins
+### alibaba(It can only be used inside the company)
+- [@ali/vscode-intl-javascript-plugin-mds](https://npm.alibaba-inc.com/package/@ali/vscode-intl-javascript-plugin-mds)
+
+# plan
+- [ ] vue plugin
+- [ ] angular plugin
+- [ ] more hooks
 # communication
 group dingding(钉钉群): 32965438

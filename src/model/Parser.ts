@@ -169,7 +169,7 @@ export default class Parser extends Service {
             return this;
         } catch (err) {
             this.isComplete = true;
-            vscode.window.showWarningMessage(`解析失败 - ${this.filepath}` + (err.stack || err.message || (err ? err.toString() : '')));
+            vscode.window.showWarningMessage(`解析失败 - ${this.filepath}: ` + (err.stack || err.message || (err ? err.toString() : '')));
             return Promise.reject();
         }
     }

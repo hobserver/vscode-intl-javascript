@@ -8,7 +8,6 @@ import SidebarWebview from './WebView';
 import ParserManager from './ParserManager';
 import { SyncWaterfallHook, HookMap, AsyncParallelHook, AsyncSeriesWaterfallHook } from 'tapable';
 export default class Parser extends Service {
-    vscode: any;
     errorCount: number;
     parserManager: ParserManager;
     private _prevDecorations;
