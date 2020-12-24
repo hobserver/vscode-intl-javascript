@@ -9,6 +9,7 @@ var md5 = require('md5');
  
 import * as fs from 'fs';
 import { Commands } from '../constants/command';
+import utils from '../utils';
 export default class {
     isRight = true
     id: string
@@ -58,7 +59,21 @@ export default class {
     }
     _replace(start: number, end: number, text: string) {
         const fileContent = fs.readFileSync(this.filepath).toString();
-        fs.writeFileSync(this.filepath, fileContent.substr(0, start) + text + fileContent.substr(end));
+        // 如果当前文件，是当前窗口，那么就用另一种api
+        const currentDocumentFilepath = utils.getCurrentFilePath();
+        if (currentDocumentFilepath === this.filepath) {
+            const activeTextEditor = utils.getActiveEditor()
+            activeTextEditor.edit((editBuilder: any) => {
+                editBuilder.replace(new vscode.Range(
+                    this.startRow - 1,
+                    this.startCol,
+                    this.endRow - 1,
+                    this.endCol,
+                ), text);
+            })
+        } else {
+            fs.writeFileSync(this.filepath, fileContent.substr(0, start) + text + fileContent.substr(end));
+        }
     }
     getCommandUrl(commandKey: any, params: any) {
         return `command:${commandKey}?${encodeURIComponent(JSON.stringify(params))}`

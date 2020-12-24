@@ -5,67 +5,16 @@ import * as vscode from 'vscode';
 import BaseErrorNode from "./BaseErrorNode";
 import Parser from "./Parser";
 import { WebviewListenerParams } from "../interface";
+import SingleWebview from './SingleWebview';
 class SidebarWebview {
-    static instance: SidebarWebview;
-    static getSingleInstance (parser: Parser) {
-        if (SidebarWebview.instance) {
-            return SidebarWebview.instance;
-        }
-        SidebarWebview.instance = new SidebarWebview(parser);
-        return SidebarWebview.instance;
-    }
-    callbackCaches: {
-        [callbackName: string]: (...args: any[]) => any
-    } = {}
-    webviewReady = false;
-    panel?: WebviewPanel;
     parser: Parser
+    singleWebview: SingleWebview
     constructor(parser: Parser) {
         this.parser = parser;
+        this.singleWebview = SingleWebview.getSingleInstance();
     }
     async open() {
-        if (this.panel) return;
-        this.panel = window.createWebviewPanel(
-            'transView',
-            '上传到服务器',
-            ViewColumn.Beside,
-            {
-                enableCommandUris: true,
-                enableScripts: true
-            }
-        );
-        this.panel.onDidDispose((webview: any) => {
-            this.panel = undefined;
-        });
-        const {webview} = this.panel;
-        if (utils.extension) {
-            const html = await this.parser?.webViewHooks.htmlHook.promise('');
-            webview.html = html as string;
-            webview.onDidReceiveMessage(this.onMessage.bind(this));
-            await new Promise(resolve => {
-                var _run = () => {
-                    setTimeout(() => {
-                        if (!this.webviewReady) {
-                            _run();
-                        } else {
-                            resolve(null);
-                        }
-                    }, 60);
-                }
-                _run();
-            });
-            this.panel?.onDidChangeViewState((webview: any) => {
-                if (webview.webviewPanel.active) {
-                    // resolve();
-                }
-            });
-            this.panel?.onDidDispose((webview: any) => {
-                this.panel = undefined;
-                this.webviewReady = false;
-            });
-        } else {
-            return Promise.reject();
-        }
+        return await this.singleWebview.openWebview(this.parser);
     }
     triggerWebviewListener(method: string, params: any, callback?: any) {
         const id = uuid();
@@ -75,7 +24,7 @@ class SidebarWebview {
             type: 'intl-js-vscode.triggerWebviewListener',
             params: params,
         });
-        this.callbackCaches[id] = callback;
+        this.singleWebview.callbackCaches[id] = callback;
     }
     sendErrorNode(errorNode: BaseErrorNode) {
         this.triggerWebviewListener('onErrorNode', errorNode);
@@ -96,25 +45,10 @@ class SidebarWebview {
         });
     }
     sendMessage(params: any) {
-        this.panel?.webview.postMessage(params);
-    }
-    onMessage(data: any) {
-        const { listenerName, id, type, params } = data;
-        if (type === 'intl-js-vscode.triggerParentListener') {
-            this.parser.processListenerHook.get(listenerName)?.promise(params).then(async () => {
-                this.sendMessage({
-                    id,
-                    type: 'intl-js-vscode.webview_callback',
-                    params: {}
-                });
-            });
-        } else if (type === 'intl-js-vscode.parent_callback') {
-            if (this.callbackCaches[id]) {
-                this.callbackCaches[id](params);
-            }
-        } else if (type === 'intl-js-vscode.document_ready') {
-            this.webviewReady = true;
-        }
+        this.singleWebview.panel?.webview.postMessage({
+            filepath: this.parser.filepath,
+            ...params
+        });
     }
 }
 export default SidebarWebview;

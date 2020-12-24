@@ -17,7 +17,7 @@ export default class WebViewPlugin {
     getStaticFileSrc(parser: Parser, filepath: string): vscode.Uri {
         const onDiskPath = vscode.Uri.file(filepath);
         // @ts-ignore
-        return parser?.webview.panel?.webview.asWebviewUri(onDiskPath);
+        return parser?.webview.singleWebview.panel?.webview.asWebviewUri(onDiskPath);
     }
     async apply(parser: Parser) {
         this.initWebviewApi(parser);
@@ -31,6 +31,16 @@ export default class WebViewPlugin {
         });
         initApiJs(parser);
         webViewHooks.jsHook.tapPromise('jss', async (jsArr: string[]) => {
+            console.log([
+                `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/uuidv4.js'))}"></script>`,
+                `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/vue.js'))}"></script>`,
+                `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/element.js'))}"></script>`,
+                `<style type="type/css">
+                    .input {
+                        width: 100%;
+                    }
+                </style>`
+            ]);
             return jsArr.concat([
                 `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/uuidv4.js'))}"></script>`,
                 `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/vue.js'))}"></script>`,

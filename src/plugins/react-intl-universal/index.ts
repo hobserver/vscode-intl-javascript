@@ -52,14 +52,9 @@ export = class {
         }));
         this.parser.webview.addParentListener('onErrorInfoReplace', (errorInfo: MessageInfoResParams) => {
             // 找到对应的ErrorNode 节点，然后调用replace方法
-            console.log(this.parser?.parserManager.caches[errorInfo.filePath]?.errors, '[000--0-00--0-0-0-00-');
-            const dd = this.parser?.parserManager.caches[errorInfo.filePath]?.errors;
             const errorNode: any = this.parser?.parserManager.caches[errorInfo.filePath]?.errors.find((item: BaseErrorNode) => {
                 return item.id === errorInfo.id;
             });
-            if (errorNode) {
-                debugger
-            }
             errorNode?.replaceAndSave(errorInfo);
         });
         this.parser.webview.addParentListener('onErrorInfoReplaceWithKuohao', (errorInfo: MessageInfoResParams) => {

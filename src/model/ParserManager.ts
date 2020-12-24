@@ -19,6 +19,7 @@ class ParserManger {
         ParserManger.instance = new ParserManger();
         return ParserManger.instance;
     }
+    
     async handleTimerQueue() {
         const filePath = utils.getCurrentFilePath();
         if (filePath) {

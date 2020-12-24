@@ -73,7 +73,7 @@ export default class Parser extends Service {
     constructor (filepath: string) {
         super();
         this.parserManager = ParserManager.getSingleInstance();
-        this.webview = SidebarWebview.getSingleInstance(this);
+        this.webview = new SidebarWebview(this);
         this.filepath = filepath;
         this.config = new Config(this, filepath);
         this.intlStorage = new IntlStorage(this.config);

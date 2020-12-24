@@ -9,6 +9,7 @@ window.webviewListener = {};
 function triggerParentListener(listenerName, params, callback) {
     const id = uuidv4();
     vscode.postMessage({
+        filepath: window.globalParserFilePath,
         id: id,
         type: 'intl-js-vscode.triggerParentListener',
         listenerName: listenerName,
