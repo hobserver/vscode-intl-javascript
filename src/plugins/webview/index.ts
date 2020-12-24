@@ -31,16 +31,6 @@ export default class WebViewPlugin {
         });
         initApiJs(parser);
         webViewHooks.jsHook.tapPromise('jss', async (jsArr: string[]) => {
-            console.log([
-                `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/uuidv4.js'))}"></script>`,
-                `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/vue.js'))}"></script>`,
-                `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/element.js'))}"></script>`,
-                `<style type="type/css">
-                    .input {
-                        width: 100%;
-                    }
-                </style>`
-            ]);
             return jsArr.concat([
                 `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/uuidv4.js'))}"></script>`,
                 `<script src="${this.getStaticFileSrc(parser, path.join(__dirname, '../../../static/js/vue.js'))}"></script>`,
