@@ -51,6 +51,8 @@ module.exports = (parser) => {
 ## batch check dir
 ![batch check dir](https://img.alicdn.com/imgextra/i1/O1CN01TVn2nk1z8S0eceaXr_!!6000000006669-1-tps-1343-915.gif)
 
+# Framework
+![Framework](https://img.alicdn.com/imgextra/i4/O1CN01yL46C41LQElDcb20I_!!6000000001293-2-tps-1452-1090.png)
 
 # Config
 ## langs [array]
