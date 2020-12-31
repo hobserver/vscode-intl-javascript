@@ -60,7 +60,7 @@ export default class {
     _replace(start: number, end: number, text: string) {
         const fileContent = fs.readFileSync(this.filepath).toString();
         // 如果当前文件，是当前窗口，那么就用另一种api
-        const currentDocumentFilepath = utils.getCurrentFilePath();
+        const currentDocumentFilepath = vscode.window.activeTextEditor?.document.fileName;
         if (currentDocumentFilepath === this.filepath) {
             const activeTextEditor = utils.getActiveEditor()
             activeTextEditor.edit((editBuilder: any) => {

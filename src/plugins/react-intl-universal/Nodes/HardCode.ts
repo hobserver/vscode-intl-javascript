@@ -10,9 +10,7 @@ export default class NoKeyErrorNode extends BaseNode {
     extraParams
     constructor(params: ErrorNodeParam, extraParams: {
         text: string
-        params?: {
-            [key: string]: any
-        },
+        params?: string | null,
         getMethod: string
     }) {
         super(params);
@@ -48,11 +46,14 @@ export default class NoKeyErrorNode extends BaseNode {
             }
         });
     }
+    getReplaceString(key: string, value: string) {
+        return `intl.get('${key}'${this.extraParams.params === null ? '' : `, ${this.extraParams.params}`}).d('${value}')`;
+    }
     async replaceAndSave(errorInfo: MessageInfoResParams, text?: string) {
-        await super.replaceAndSave(errorInfo, text ? text : `intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')`);
+        await super.replaceAndSave(errorInfo, text ? text : this.getReplaceString(errorInfo.key, errorInfo.langs[0].value as string));
     }
     async replaceAndSaveWithBrackets(errorInfo: MessageInfoResParams) {
-        await this.replaceAndSave(errorInfo, `{intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')}`);
+        await this.replaceAndSave(errorInfo, `{${this.getReplaceString(errorInfo.key, errorInfo.langs[0].value as string)}}`);
     }
     showMenu({
         position,
