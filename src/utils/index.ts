@@ -12,10 +12,12 @@ export default {
         return extensions.getExtension(this.extensionId);
     },
     diagnostic: vscode.languages.createDiagnosticCollection(id),
-    activeTextEditor: vscode.TextEdit,
+    activeTextEditor: null,
+    lastFilePath: null,
     setActiveTextEditor(activeTextEditor: any) {
-        if (activeTextEditor?.document?.fileName) {
+        if (activeTextEditor && activeTextEditor.document && activeTextEditor.document.fileName && activeTextEditor.document.fileName != '') {
             this.activeTextEditor = activeTextEditor;
+            this.lastFilePath = activeTextEditor.document.fileName;
         }
     },
     getActiveEditor(): any {
@@ -26,8 +28,10 @@ export default {
             throw new Error('请选择一个文件');
         }
     },
+    getLastFilePath() {
+        return this.lastFilePath;
+    },
     getCurrentFilePath() {
-        const activeTextEditor = this.getActiveEditor();
-        return activeTextEditor.document.fileName;
+        return vscode.window.activeTextEditor?.document.fileName;
     }
 }

@@ -157,7 +157,7 @@ export = class {
                 }
             } else { // 硬编码
                 let node = nodePath.node;
-                let replaceParams = null;
+                let replaceParams: any = null;
                 // 对模板字符串单独处理
                 if (node.type === 'TemplateElement') {
                     let newNodePath = nodePath.findParent((item: any) => {
@@ -194,20 +194,28 @@ export = class {
                         || locNode.end
                     ) {
                         const isHtml = /<(?:html|head|title|base|link|meta|style|script|noscript|template|body|section|nav|article|aside|h1|h2|h3|h4|h5|h6|header|footer|address|main|p|hr|pre|blockquote|ol|ul|li|dl|dt|dd|figure|figcaption|div|a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img|iframe|embed|object|param|video|audio|source|track|canvas|map|area|svg|math|table|caption|colgroup|col|tbody|thead|tfoot|tr|td|th|form|fieldset|legend|label|input|button|select|datalist|optgroup|option|textarea|keygen|output|progress|meter|details|summary|menuitem|menu)[^>]*>/;
-                        this.parser?.pushError(new HardCodeErrorNode({
-                            parser: this.parser,
-                            filepath: filePath,
-                            start: node.start,
-                            end: node.end,
-                            startRow: locNode.start.line,
-                            startCol: locNode.start.column,
-                            endRow: locNode.end.line,
-                            endCol: locNode.end.column,
-                        }, {
-                            text: nodeValue,
-                            params: replaceParams,
-                            getMethod: isHtml.test(nodeValue) ? 'getHTML': 'get'
-                        }));
+                        this.parser?.babelHooks.isGrammarIgnoreHook.promise({
+                            pluginName: 'react-intl-universal',
+                            type: 'hardCode',
+                            nodePath: nodePath
+                        }).then(result => {
+                            if (!result) {
+                                this.parser?.pushError(new HardCodeErrorNode({
+                                    parser: this.parser,
+                                    filepath: filePath,
+                                    start: node.start,
+                                    end: node.end,
+                                    startRow: locNode.start.line,
+                                    startCol: locNode.start.column,
+                                    endRow: locNode.end.line,
+                                    endCol: locNode.end.column,
+                                }, {
+                                    text: nodeValue.replace(/\$\{/g, '{'),
+                                    params: replaceParams,
+                                    getMethod: isHtml.test(nodeValue) ? 'getHTML': 'get'
+                                }));
+                            }
+                        });
                     } else {
                         throw(new Error('缺少位置信息'));
                     }

@@ -4,6 +4,11 @@ import CommonCommand from "../model/CommonCommand";
 import ConfigCommonCommand from "../plugins/config-menu-command/ConfigMenuCommand";
 export declare type LangKey = 'zh_CN' | 'en_US' | 'zh_TW';
 export { Parser };
+export interface GrammarCheckParam {
+    pluginName: string;
+    type: string;
+    nodePath: any;
+}
 export interface ParserService {
     configMenuCommand: ConfigCommonCommand;
     hoverMenuCommand: CommonCommand<HoverMenuCommandParam>;

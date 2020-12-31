@@ -3,10 +3,10 @@ import BaseErrorNode from './BaseErrorNode';
 import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import Service from './Service';
-import { MessageInfoSendParams, WebviewBtn, WebviewListenerParams } from '../interface';
+import { GrammarCheckParam, MessageInfoSendParams, WebviewBtn, WebviewListenerParams } from '../interface';
 import SidebarWebview from './WebView';
 import ParserManager from './ParserManager';
-import { SyncWaterfallHook, HookMap, AsyncParallelHook, AsyncSeriesWaterfallHook } from 'tapable';
+import { SyncWaterfallHook, HookMap, AsyncParallelHook, AsyncSeriesBailHook, AsyncSeriesWaterfallHook } from 'tapable';
 export default class Parser extends Service {
     errorCount: number;
     parserManager: ParserManager;
@@ -34,6 +34,7 @@ export default class Parser extends Service {
     babelHooks: {
         babelPresetHook: SyncWaterfallHook<[string[]]>;
         babelPluginHook: SyncWaterfallHook<[string[]]>;
+        isGrammarIgnoreHook: AsyncSeriesBailHook<GrammarCheckParam, boolean>;
     };
     updateHook: AsyncSeriesWaterfallHook<[(() => void)[]]>;
     processListenerHook: HookMap<AsyncParallelHook<[any]>>;

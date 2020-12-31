@@ -32,13 +32,15 @@ export default function init(context: ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('vscode-intl-javascript.CHECK_DIR_LOCALE', () => {
         // 获取当前文件路径, 然后根据路径获取配置文件
         const filepath = utils.getCurrentFilePath();
-        const currentDir = path.dirname(filepath);
-        window.showInputBox({
-            prompt: '请输入要check的文件夹路径',
-            value: currentDir,
-            valueSelection: [currentDir.lastIndexOf('/'), currentDir.length]
-        }).then((dir: any) => {
-            ParserManager.getSingleInstance().parseDir(currentDir); 
-        });
+        if (filepath) {
+            const currentDir = path.dirname(filepath);
+            window.showInputBox({
+                prompt: '请输入要check的文件夹路径',
+                value: currentDir,
+                valueSelection: [currentDir.lastIndexOf('/'), currentDir.length]
+            }).then((dir: any) => {
+                ParserManager.getSingleInstance().parseDir(currentDir); 
+            });
+        }
     }));
 }

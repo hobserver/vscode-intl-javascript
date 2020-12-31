@@ -10,8 +10,6 @@ npm install vscode-intl-javascript react-intl-universal --save-dev
 ```
 const ReactBabel = require('vscode-intl-javascript/out/plugins/react');
 const ReactIntlUniversal = require('vscode-intl-javascript/out/plugins/react-intl-universal');
-const path = require('path');
-const intl = require('react-intl-universal');
 module.exports = (parser) => {
     return {
         langs: [

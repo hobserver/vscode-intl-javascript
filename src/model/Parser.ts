@@ -6,7 +6,7 @@ import Config from "./Config";
 import IntlStorage from "./IntlStorage";
 import utils from '../utils/index';
 import Service from './Service';
-import { MessageInfoSendParams, WebviewBtn, WebviewListenerParams } from '../interface';
+import { GrammarCheckParam, MessageInfoSendParams, WebviewBtn, WebviewListenerParams } from '../interface';
 import WebViewPlugin from '../plugins/webview/index';
 import HoverCommandPlugin from '../plugins/hover-menu-command/index';
 import ConfigCommandPlugin from '../plugins/config-menu-command/index';
@@ -17,6 +17,7 @@ import {
     SyncWaterfallHook,
     HookMap,
     AsyncParallelHook,
+    AsyncSeriesBailHook,
     AsyncSeriesWaterfallHook
 } from 'tapable';
 export default class Parser extends Service {
@@ -38,7 +39,8 @@ export default class Parser extends Service {
     // @ts-ignore
     public babelHooks: {
         babelPresetHook: SyncWaterfallHook<[string[]]>,
-        babelPluginHook: SyncWaterfallHook<[string[]]>
+        babelPluginHook: SyncWaterfallHook<[string[]]>,
+        isGrammarIgnoreHook: AsyncSeriesBailHook<GrammarCheckParam, boolean>,
     }
     // @ts-ignore
     public updateHook: AsyncSeriesWaterfallHook<[(() => void)[]]>
@@ -100,6 +102,7 @@ export default class Parser extends Service {
         this.babelHooks = {
             babelPresetHook: new SyncWaterfallHook(['presets']),
             babelPluginHook: new SyncWaterfallHook(['plugins']),
+            isGrammarIgnoreHook: new AsyncSeriesBailHook(['GrammarCheckParam']),
         };
         this.webViewHooks = {
             htmlHook: new AsyncSeriesWaterfallHook(['html']),
