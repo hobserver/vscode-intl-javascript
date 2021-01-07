@@ -186,7 +186,7 @@ export default class Parser extends Service {
         ];
         this.decorations = {};
         this._prevDecorations.forEach(decoration => {
-            utils.getActiveEditor()?.setDecorations(decoration, [])
+            utils.getActiveTextEditor()?.setDecorations(decoration, [])
         });
         this._prevDecorations = [];
         this.errorsMap = {};
@@ -221,7 +221,7 @@ export default class Parser extends Service {
                 }
             );
             this._prevDecorations.push(decoration);
-            utils.getActiveEditor()?.setDecorations(decoration, this.decorations[decorationType])
+            utils.getActiveTextEditor()?.setDecorations(decoration, this.decorations[decorationType])
         });
     }
     private babelParser() {

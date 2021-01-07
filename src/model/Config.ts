@@ -31,6 +31,7 @@ export default class {
         // 找文件
         const configFile = this.findConfigFile();
         if (configFile) {
+            this.checkConfigVscodeIntlJavascriptVersion(configFile);
             return this.handleConfigFile(configFile);
         } else {
             return Promise.reject();
@@ -62,6 +63,28 @@ export default class {
         const configFile = findConfigFile(path.dirname(this.filepath));
         return configFile;
     }
+    async checkConfigVscodeIntlJavascriptVersion(configFile: string) {
+        // 检测configFile项目目录当中的vscode-intl-javascript的版本，是否和当前版本保持一致，否则就提醒
+        // 一次向上查找node_modules里面的vscode-intl-javascript的版本
+        let configDir = path.dirname(configFile);
+        while(configDir !== '/') {
+            const nodeModulesPath = configDir + '/node_modules/vscode-intl-javascript';
+            if (fs.existsSync(nodeModulesPath)) {
+                const packageJson = require(`${nodeModulesPath}/package.json`);
+                const currentPackageJson = require('../../package.json');
+                if (packageJson.version !== currentPackageJson.version) {
+                    vscode.window.showErrorMessage(`
+                    请升级版本：npm install vscode-intl-javascript@${currentPackageJson.version} --save-dev
+                    当前配置文件所在项目引用的vscode-intl-javascript版本和vscode插件版本不一致，
+                    `);
+                }
+                break;
+            } else {
+                configDir = path.dirname(configDir);
+            }
+        }
+    }
+
     async getTempDir(configFile: string | null): Promise<string> {
         if (!configFile) {
             configFile = this.findConfigFile();

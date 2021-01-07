@@ -60,9 +60,9 @@ export default class {
     _replace(start: number, end: number, text: string) {
         const fileContent = fs.readFileSync(this.filepath).toString();
         // 如果当前文件，是当前窗口，那么就用另一种api
-        const currentDocumentFilepath = vscode.window.activeTextEditor?.document.fileName;
+        const currentDocumentFilepath = utils.getCurrentFilePath();
         if (currentDocumentFilepath === this.filepath) {
-            const activeTextEditor = utils.getActiveEditor()
+            const activeTextEditor = utils.getActiveTextEditor()
             activeTextEditor.edit((editBuilder: any) => {
                 editBuilder.replace(new vscode.Range(
                     this.startRow - 1,
@@ -102,7 +102,7 @@ export default class {
         this._replace(this.start, this.end, text ? text : `intl.get('${errorInfo.key}').d('${errorInfo.langs[0].value}')`);
     }
     putColor() {
-        const activeEditor = this.parser.utils.getActiveEditor();
+        const activeEditor = this.parser.utils.getActiveTextEditor();
         const {document} = activeEditor;
         if (document) {
             this.parser.addDecoration('red', {

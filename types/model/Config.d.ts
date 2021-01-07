@@ -18,6 +18,7 @@ export default class {
     init(): Promise<void>;
     getFirstLangKey(): LangKey;
     findConfigFile(): string | null;
+    checkConfigVscodeIntlJavascriptVersion(configFile: string): Promise<void>;
     getTempDir(configFile: string | null): Promise<string>;
     handleConfigFile(configFile: string): Promise<void>;
 }

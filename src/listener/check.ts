@@ -16,8 +16,8 @@ export default function init(context: ExtensionContext) {
         if (filepath) {
             if (path.isAbsolute(filepath)) {
                 utils.setActiveTextEditor(vscode.window.activeTextEditor);
+                update();
             }
-            update();
         }
     }));
     context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(() => {
@@ -25,8 +25,8 @@ export default function init(context: ExtensionContext) {
         if (filepath) {
             if (path.isAbsolute(filepath)) {
                 utils.setActiveTextEditor(vscode.window.activeTextEditor);
+                update();
             }
-            update();
         }
     }));
     context.subscriptions.push(vscode.commands.registerCommand('vscode-intl-javascript.CHECK_DIR_LOCALE', () => {

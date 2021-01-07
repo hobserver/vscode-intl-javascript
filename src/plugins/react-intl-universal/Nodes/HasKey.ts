@@ -146,7 +146,7 @@ export default class HasKeyErrorNode extends BaseNode {
             this.check();
         }
         // 获取第一个不合格的颜色
-        const activeEditor = this.parser.utils.getActiveEditor();
+        const activeEditor = this.parser.utils.getActiveTextEditor();
         const {document} = activeEditor;
         if (document) {
             // 缺少那个，显示那个颜色，只有两个都满足才不会着色
