@@ -70,7 +70,7 @@ export default class {
         while(configDir !== '/') {
             const nodeModulesPath = configDir + '/node_modules/vscode-intl-javascript';
             if (fs.existsSync(nodeModulesPath)) {
-                const packageJson = require(`${nodeModulesPath}/package.json`);
+                const packageJson = noCacheRequire(`${nodeModulesPath}/package.json`);
                 const currentPackageJson = require('../../package.json');
                 if (packageJson.version !== currentPackageJson.version) {
                     vscode.window.showErrorMessage(`

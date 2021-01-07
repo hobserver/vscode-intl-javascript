@@ -65,6 +65,7 @@ export default class Parser extends Service {
             methodsHook: AsyncSeriesWaterfallHook<[WebviewListenerParams[]]>,
         }
     }
+    // @ts-ignore
     public intlStorage: IntlStorage
     public filepath: string
     private isComplete: boolean = true;
@@ -78,7 +79,6 @@ export default class Parser extends Service {
         this.webview = new SidebarWebview(this);
         this.filepath = filepath;
         this.config = new Config(this, filepath);
-        this.intlStorage = new IntlStorage(this.config);
     }
     async handlePlugins() {
         for (var i = 0; i < this.plugins.length; i++) {
@@ -179,6 +179,7 @@ export default class Parser extends Service {
     private resetDataForConfig() {
         this.errors = [];
         this.diagnostics = [];
+        this.intlStorage = new IntlStorage(this.config);
         this.plugins = [
             new ConfigCommandPlugin(),
             new HoverCommandPlugin(),

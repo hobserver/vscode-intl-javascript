@@ -1,6 +1,7 @@
 import { ExtensionContext, commands, window, HoverProvider, ViewColumn } from "vscode";
 import * as vscode from 'vscode';
 import ParserManager from '../model/ParserManager';
+import utils from "../utils";
 
 class CodeHover implements HoverProvider {
     provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {

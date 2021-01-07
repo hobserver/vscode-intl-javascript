@@ -16,12 +16,10 @@ export default class Parser extends Service {
         readonly extension: vscode.Extension<any>;
         diagnostic: vscode.DiagnosticCollection;
         activeTextEditor: null;
-        lastFilePath: null;
+        lastFilePath: string;
         setActiveTextEditor(activeTextEditor: any): void;
-        getFirstActiveEditor(): vscode.TextEditor;
-        isAbsoluteActiveEditor(activeEditor: vscode.TextEditor): boolean;
+        setLastFilePath(filePath: any): void;
         getActiveTextEditor(): any;
-        getLastFilePath(): null;
         getCurrentFilePath(): string;
     };
     plugins: any;

@@ -13,47 +13,18 @@ export default {
     },
     diagnostic: vscode.languages.createDiagnosticCollection(id),
     activeTextEditor: null,
-    lastFilePath: null,
+    lastFilePath: '',
     setActiveTextEditor(activeTextEditor: any) {
-        if (activeTextEditor && activeTextEditor.document && activeTextEditor.document.fileName && activeTextEditor.document.fileName != '') {
-            this.lastFilePath = activeTextEditor.document.fileName;
-        }
+        this.activeTextEditor = activeTextEditor;
+        this.setLastFilePath(activeTextEditor.document.fileName);
     },
-    getFirstActiveEditor() {
-        const activeEditor = vscode.window.visibleTextEditors.find(item => {
-            if (item.document.fileName) {
-                return true;
-            }
-        });
-        if (activeEditor && path.isAbsolute(activeEditor.document.fileName)) {
-            return activeEditor;
-        } else {
-            vscode.window.showInformationMessage('请选择一个文件');
-            throw new Error('请选择一个文件');
-        }
-    },
-    isAbsoluteActiveEditor(activeEditor: vscode.TextEditor) {
-        if (activeEditor.document.fileName && path.isAbsolute(activeEditor.document.fileName)) {
-            return true;
-        } else {
-            return false;
-        }
+    setLastFilePath(filePath: any) {
+        this.lastFilePath = filePath;
     },
     getActiveTextEditor(): any {
-        if (!vscode.window.activeTextEditor) {
-            return this.getFirstActiveEditor();
-        } else {
-            if (this.isAbsoluteActiveEditor(vscode.window.activeTextEditor)) {
-                return vscode.window.activeTextEditor;
-            } else {
-                return this.getFirstActiveEditor();
-            }
-        }
-    },
-    getLastFilePath() {
-        return this.lastFilePath;
+        return this.activeTextEditor;
     },
     getCurrentFilePath(): string {
-        return this.getActiveTextEditor().document.fileName;
+        return this.lastFilePath;
     }
 }

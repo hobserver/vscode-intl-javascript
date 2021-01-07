@@ -4,12 +4,10 @@ declare const _default: {
     readonly extension: vscode.Extension<any>;
     diagnostic: vscode.DiagnosticCollection;
     activeTextEditor: null;
-    lastFilePath: null;
+    lastFilePath: string;
     setActiveTextEditor(activeTextEditor: any): void;
-    getFirstActiveEditor(): vscode.TextEditor;
-    isAbsoluteActiveEditor(activeEditor: vscode.TextEditor): boolean;
+    setLastFilePath(filePath: any): void;
     getActiveTextEditor(): any;
-    getLastFilePath(): null;
     getCurrentFilePath(): string;
 };
 export default _default;

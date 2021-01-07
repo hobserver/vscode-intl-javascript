@@ -2,8 +2,8 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "es6",
-		"declaration": true,
-		"declarationDir": "./types",
+		// "declaration": true,
+		// "declarationDir": "./types",
 		"outDir": "out",
 		"lib": [
 			"es6"
